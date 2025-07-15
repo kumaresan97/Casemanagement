@@ -1,0 +1,38 @@
+//
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  height: calc(100vh - 60px); // subtract topbar height
+  overflow: hidden; // prevent outer scroll
+}
+
+.content {
+  flex: 1;
+  padding: 1.5rem;
+  // overflow-y: auto;
+  background-color: #f9f9f9;
+  overflow: hidden;
+
+  // scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #ccc transparent;
+
+  &::-webkit-scrollbar {
+    width: 3px !important;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 3px !important;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}

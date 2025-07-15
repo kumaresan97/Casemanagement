@@ -1,0 +1,19 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "case-management-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/caseManagement/CaseManagementWebPart.js",
+          "manifest": "./src/webparts/caseManagement/CaseManagementWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "CaseManagementWebPartStrings": "lib/webparts/caseManagement/loc/{locale}.js",
+    "ControlStrings": "node_modules/@pnp/spfx-controls-react/lib/loc/{locale}.js"
+  }
+}

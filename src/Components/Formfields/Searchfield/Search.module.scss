@@ -1,0 +1,11 @@
+.search {
+  border-radius: 20px !important;
+  box-shadow: none !important;
+  &:hover {
+    box-shadow: none !important;
+  }
+
+  input {
+    border: none !important;
+  }
+}

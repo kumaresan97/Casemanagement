@@ -1,0 +1,19 @@
+.layoutContainer {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}

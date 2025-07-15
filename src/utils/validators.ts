@@ -1,0 +1,21 @@
+export const isValidEmail = (value: string): boolean =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+
+export const isValidPhone = (value: string): boolean =>
+  /^[0-9+\-\s()]{7,15}$/.test(value);
+
+export const isNonEmpty = (value: any): boolean =>
+  value !== null &&
+  value !== undefined &&
+  value !== "" &&
+  !(Array.isArray(value) && value.length === 0);
+
+export const isValidSelect = (val: any): boolean => {
+  return val && typeof val === "object" && val.value?.trim?.().length > 0;
+};
+
+export const isValidPeoplePicker = (value: any): boolean =>
+  typeof value === "object" && value !== null && "id" in value;
+
+export const isValidFileArray = (value: any): boolean =>
+  Array.isArray(value) && value.length > 0;

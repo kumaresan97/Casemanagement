@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "case-management-client-side-solution",
+    "id": "3a23b88d-883f-4038-94e4-13f7ec56c30c",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.18.2"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "CaseManagement description"
+      },
+      "longDescription": {
+        "default": "CaseManagement description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "case-management Feature",
+        "description": "The feature that activates elements of the case-management solution.",
+        "id": "6211aea2-d778-4b8c-9dac-2191de32ddf5",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/case-management.sppkg"
+  }
+}

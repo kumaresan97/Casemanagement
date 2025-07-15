@@ -1,0 +1,21 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "18.18.1",
+    "sdksVersions": {
+      "@microsoft/microsoft-graph-client": "3.0.2",
+      "@microsoft/teams-js": "2.12.0"
+    },
+    "version": "1.18.2",
+    "libraryName": "case-management",
+    "libraryId": "3a23b88d-883f-4038-94e4-13f7ec56c30c",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "CaseManagement",
+    "solutionShortDescription": "CaseManagement description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}

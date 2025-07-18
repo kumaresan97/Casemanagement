@@ -15,6 +15,7 @@ interface PageHeaderProps {
     onSearch?: (value: string) => void;
     onRefresh?: () => void;
     onButtonClick?: () => void;
+    searchPlaceholder?: string;
 }
 
 
@@ -31,6 +32,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
     onSearch,
     onRefresh,
     onButtonClick,
+    searchPlaceholder
 }) => {
     const [searchText, setSearchText] = React.useState('');
 
@@ -57,7 +59,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                         onChange={(val) => {
                             setSearchText(val);       // update local search text
                             onSearch?.(val);          // call parent onSearch
-                        }} placeholder="Search cases..."
+                        }} placeholder={searchPlaceholder}
                         width={200}
 
                     />

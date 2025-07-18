@@ -68,11 +68,17 @@ export const handleSubmitData = async (formdata: CompleteCaseForm) => {
   const { clientDetails, caseDetails, appointment } = splitFormData(formdata);
 
   try {
-    let clientId: number;
+    let clientId: number | any;
 
     // 🔹 If existing client, reuse selected client ID
-    if (formdata.ClientType?.value === "Existing" && formdata.clientId) {
-      clientId = parseInt(formdata.clientId);
+    if (
+      formdata.ClientType?.value === "Existing" &&
+      formdata.ExistingClient?.value
+    ) {
+      clientId =
+        formdata.ExistingClient?.value != null
+          ? parseInt(String(formdata.ExistingClient.value))
+          : null;
     } else {
       // 🔹 Add new ClientDetails
       const clientRes: any = await SpServices.SPAddItem({
@@ -98,25 +104,58 @@ export const handleSubmitData = async (formdata: CompleteCaseForm) => {
     );
 
     // 🔹 Create folder in CaseDocuments
-    await sp.web
+    const folderResult = await sp.web
       .getFolderByServerRelativeUrl("CaseDocuments")
       .folders.add(caseFolderName);
 
-    // 🔹 Upload attachments
+    // 🔹 Set metadata on the folder itself (optional but fixes missing parent caseId)
+    const folderItem = await folderResult.folder.listItemAllFields.get();
+    await sp.web.lists
+      .getByTitle("CaseDocuments")
+      .items.getById(folderItem.Id)
+      .update({
+        caseId: caseId,
+        Title: caseFolderName,
+      });
+
+    // 🔹 Upload attachments in parallel
     const attachments = formdata.attachments;
     if (attachments?.length) {
-      for (const file of attachments) {
-        const fileAddResult = await sp.web
-          .getFolderByServerRelativeUrl(`CaseDocuments/${caseFolderName}`)
-          .files.add(file.name, file.content, true);
+      await Promise.all(
+        attachments.map(async (file) => {
+          const fileAddResult = await sp.web
+            .getFolderByServerRelativeUrl(`CaseDocuments/${caseFolderName}`)
+            .files.add(file.name, file.content, true);
 
-        const item = await fileAddResult.file.getItem();
-        await item.update({
-          caseId: caseId,
-          Title: file.name,
-        });
-      }
+          const item = await fileAddResult.file.getItem();
+          await item.update({
+            caseId: caseId,
+            Title: file.name,
+          });
+        })
+      );
     }
+
+    // // 🔹 Create folder in CaseDocuments
+    // await sp.web
+    //   .getFolderByServerRelativeUrl("CaseDocuments")
+    //   .folders.add(caseFolderName);
+
+    // // 🔹 Upload attachments
+    // const attachments = formdata.attachments;
+    // if (attachments?.length) {
+    //   for (const file of attachments) {
+    //     const fileAddResult = await sp.web
+    //       .getFolderByServerRelativeUrl(`CaseDocuments/${caseFolderName}`)
+    //       .files.add(file.name, file.content, true);
+
+    //     const item = await fileAddResult.file.getItem();
+    //     await item.update({
+    //       caseId: caseId,
+    //       Title: file.name,
+    //     });
+    //   }
+    // }
 
     // 🔹 Add to Appointments
     await SpServices.SPAddItem({
@@ -127,7 +166,7 @@ export const handleSubmitData = async (formdata: CompleteCaseForm) => {
       },
     });
 
-    alert("All data and documents submitted successfully!");
+    // alert("All data and documents submitted successfully!");
   } catch (err) {
     console.error("Submission Error:", err);
     alert("Error occurred while submitting data.");
@@ -226,7 +265,8 @@ export const fetchExistingClient = async (
 
 export const fetchClientDetails = async (
   clientId: string,
-  setFormData: any
+  setFormData: any,
+  Existing: any
 ) => {
   const client = await sp.web.lists
     .getByTitle(constants.Listnames.ClientDetails)
@@ -266,6 +306,7 @@ export const fetchClientDetails = async (
     ContactDetails: client.ContactDetails || null,
     ContactPreference: client.ContactPreference || null,
     Refferal: client.Refferal || null,
+    ExistingClient: Existing || null,
     Occupation: client.Occupation || "",
     ServiceType: client.ServiceType
       ? client.ServiceType.map((item: any) => ({
@@ -275,7 +316,6 @@ export const fetchClientDetails = async (
       : [],
   };
 
-  debugger;
   setFormData((prev: any) => ({
     ...prev,
     ...clientDetails,

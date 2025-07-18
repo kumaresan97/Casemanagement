@@ -32,7 +32,7 @@ const AllCases = () => {
 
     const handleEdit = (record: cases) => {
         console.log("Edit:", record);
-        navigate(`/AllCases/${1}`);
+        navigate(`/AllCases/${record.Id}`);
     };
 
     const handleDelete = (record: cases) => {
@@ -115,7 +115,12 @@ const AllCases = () => {
             render: (Status: string) => {
                 return (
                     <div style={{ display: "flex", alignItems: "center" }}>
-                        <EllipsisTag label={Status} />
+                        <EllipsisTag label={Status} style={{
+                            borderRadius: "20px",
+                            textAlign: "center",
+                            border: "none"
+
+                        }} />
                     </div>
 
                 );
@@ -210,31 +215,15 @@ const AllCases = () => {
                 buttonTitle="Create case"
                 buttonIcon={<PlusCircleOutlined />}
                 onSearch={handleSearch}
+                searchPlaceholder="Search"
                 onFilter={() => console.log('Filter clicked')}
-                // onSearch={(val) => {
-                //     // setSearchText(val);
 
-                //     const filtered = searchFunction(val, masterData);
-                //     setAllCase(filtered);
-
-                // }}
                 onRefresh={() => console.log('Refresh clicked')}
                 onButtonClick={() =>
                     navigate("/cases/new")
                 }
             />
-            {/* <PageHeader
-                title="All Cases"
-                showFilter
-                showSearch
-                showRefresh
-                buttonTitle="Create case"
-                buttonIcon={<PlusCircleOutlined />}
-                onFilter={() => console.log('Filter clicked')}
-                onSearch={(val) => console.log('Search:', val)}
-                onRefresh={() => console.log('Refresh clicked')}
-                onButtonClick={() => console.log('Create case clicked')}
-            /> */}
+
             <CommonTable<cases>
                 columns={columns}
                 data={allCase}

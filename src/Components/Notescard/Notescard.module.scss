@@ -1,0 +1,48 @@
+.noteCard {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  background-color: #fff;
+}
+
+.noteHeader {
+  background-color: #f9f5e8;
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+  }
+
+  .icon {
+    font-size: 18px;
+    color: #666;
+  }
+
+  .billable {
+    background-color: #f3efca;
+    color: #cfa21e;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 12px;
+  }
+}
+
+.noteBody {
+  padding: 1rem;
+  font-size: 14px;
+  color: #555;
+
+  p {
+    margin: 0;
+  }
+}

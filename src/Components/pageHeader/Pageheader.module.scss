@@ -9,8 +9,26 @@
 
 .title {
   font-size: 20px;
-  font-weight: 600;
+  font-family: "Intermedium" sans-serif !important;
+  font-weight: 500;
+  // font-weight: 600;
   margin: 0;
+  position: relative;
+  display: inline-block;
+  z-index: 1; // ensure the text is above the line
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    width: 50%;
+    height: 2px;
+    background-color: #cfa21e; // or any color you like
+    z-index: 0; // behind the text
+  }
 }
 
 .actions {

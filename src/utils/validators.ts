@@ -10,8 +10,24 @@ export const isNonEmpty = (value: any): boolean =>
   value !== "" &&
   !(Array.isArray(value) && value.length === 0);
 
+// export const isValidSelect = (val: any): boolean => {
+//   return val && typeof val === "object" && val.value?.length > 0;
+// };
+
 export const isValidSelect = (val: any): boolean => {
-  return val && typeof val === "object" && val.value?.trim?.().length > 0;
+  if (!val || typeof val !== "object") return false;
+
+  const v = val.value;
+
+  if (typeof v === "string") {
+    return v.trim().length > 0;
+  }
+
+  if (typeof v === "number") {
+    return true; // any number is valid, including 0
+  }
+
+  return false;
 };
 
 export const isValidPeoplePicker = (value: any): boolean =>

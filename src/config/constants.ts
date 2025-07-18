@@ -6,6 +6,7 @@ export namespace constants {
     CaseDetails: "CaseDetails",
     Appointments: "Appointments",
     ServiceType: "ServiceType",
+    CaseNotes: "CaseNotes",
   };
 }
 
@@ -55,6 +56,7 @@ export const initialFormData: CompleteCaseForm = {
   HealthInsurance: { label: "", value: "" } || null,
   Religion: { label: "", value: "" } || null,
   BillableType: { label: "", value: "" } || null,
+  ExistingClient: { label: "", value: "" } || null,
   clientId: null,
 
   // Lookups
@@ -81,4 +83,5 @@ export const Cases: cases = {
   ClientId: null,
   Status: "",
   Date: "",
+  BillableType: { label: "", value: "" },
 };

@@ -13,11 +13,11 @@ const getTagStyle = (label: string): React.CSSProperties => {
     const lower = label.toLowerCase();
 
     if (lower.includes('pending')) {
-        return { background: '#FFF5E5', color: '#D46B08' }; // orange
-    } else if (lower.includes('completed') || lower.includes('resolved')) {
-        return { background: '#E6FFFB', color: '#08979C' }; // teal
+        return { background: '#f7f0dc', color: '##584206' }; // orange
+    } else if (lower.includes('completed')) {
+        return { background: '#ddf8e6', color: '#06580B' }; // teal
     } else if (lower.includes('cancelled')) {
-        return { background: '#FFF1F0', color: '#CF1322' }; // red
+        return { background: '#f8ddde', color: '#580607' }; // red
     } else {
         return { background: '#FFFAEA', color: '#333' }; // default
     }
@@ -41,7 +41,7 @@ const EllipsisTag: React.FC<EllipsisTagProps> = ({
                     ...colorStyle,
                     width: width ?? 100,
 
-                    borderRadius: 2,
+                    // borderRadius: 2,
                     maxWidth,
                     overflow: 'hidden',
                     whiteSpace: 'nowrap',

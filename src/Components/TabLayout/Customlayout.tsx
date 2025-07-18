@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/no-var-requires */
 import * as React from 'react';
 import { Tabs } from 'antd';
-import styles from "./Tabs.module.scss"
+import styles from "./CustomTab.module.scss"
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import SelectField from '../Formfields/Dropdown/CustomDropdown';
-
+const Backicon = require("../../assets/png/backicon.png")
 interface TabItem {
     key: string;
     label: string;
@@ -30,27 +32,12 @@ const CommonTabLayout: React.FC<CommonTabLayoutProps> = ({ title, basePath, tabs
 
     return (
 
-        <div className={styles.layoutContainer}>
-            <div className={styles.header}>
-                <h2>{title}</h2>
-                <SelectField />
+        // <div className={styles.layoutContainer}>
+        //     <div className={styles.header}>
+        //         <h2>{title}</h2>
+        //         <SelectField />
 
-            </div>
-            <Tabs
-                activeKey={activeKey}
-                onChange={handleTabChange}
-                items={tabs.map(tab => ({
-                    key: tab.key,
-                    label: tab.label,
-                }))}
-            />
-            <div className={styles.content}>
-                <Outlet />
-            </div>
-        </div>
-
-        // <div style={{ padding: '1rem', backgroundColor: '#fff', borderRadius: 8 }}>
-        //     {title && <h2 style={{ marginBottom: 16 }}>{title}</h2>}
+        //     </div>
         //     <Tabs
         //         activeKey={activeKey}
         //         onChange={handleTabChange}
@@ -59,10 +46,44 @@ const CommonTabLayout: React.FC<CommonTabLayoutProps> = ({ title, basePath, tabs
         //             label: tab.label,
         //         }))}
         //     />
-        //     <div style={{ marginTop: 24 }}>
+        //     <div className={styles.content}>
         //         <Outlet />
         //     </div>
         // </div>
+        <div className={styles.layoutContainer}>
+            <div className={styles.header}>
+                <div className={styles.titleWrapper}>
+                    <img src={Backicon} alt="backicon" className={styles.backIcon} onClick={() => {
+                        navigate("/AllCases")
+                    }} />
+                    {/* <LeftOutlined className={styles.backIcon} /> */}
+                    <p>{title}</p>
+                </div>
+                <div style={{ width: "250px" }}>
+                    <SelectField />
+                </div>
+
+
+
+            </div>
+
+            <div className={styles.tabsWrapper}>
+                <Tabs
+                    // className={styles.tabs}
+                    activeKey={activeKey}
+                    onChange={handleTabChange}
+                    items={tabs.map(tab => ({
+                        key: tab.key,
+                        label: tab.label,
+                    }))}
+                />
+            </div>
+
+            <div className={styles.content}>
+                <Outlet />
+            </div>
+        </div>
+
     );
 };
 

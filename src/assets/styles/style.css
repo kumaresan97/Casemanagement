@@ -566,16 +566,17 @@ textarea {
   width: 0 !important;
 }
 .ant-table-thead > tr > th {
-  padding-top: 10px !important;
-  padding-bottom: 10px !important;
+  padding: 10px 16px !important;
+  /* padding-top: 10px !important;
+  padding-bottom: 10px !important; */
 }
 .ant-table-thead .ant-table-cell {
   /* background-color: #f1f5fa; */
   background-color: #f7faff;
-  font-family: "robotoFlex", sans-serif !important;
-  font-weight: 600 !important;
+  font-family: "Internormal", sans-serif !important;
+  font-weight: 500 !important;
   font-size: 13px !important;
-  color: #303e67 !important;
+  /* color: #303e67 !important; */
   letter-spacing: 0.4px !important;
   /* height: 42px !important; */
 }
@@ -600,22 +601,22 @@ textarea {
   /* padding: 15px 10px !important; */
   /* height: 48px !important; */
   font-weight: 400 !important;
-  color: #303e67 !important;
-  font-family: "robotoFlex", sans-serif !important;
+  /* color: #303e67 !important; */
+  font-family: "Internormal", sans-serif !important;
   font-weight: 400 !important;
-  color: #303e67 !important;
-  font-family: "robotoFlex", sans-serif !important;
-  padding: 10px !important;
+  /* color: #303e67 !important; */
+  /* font-family: "robotoFlex", sans-serif !important; */
+  padding: 10px 16px !important;
 }
 
 .ant-table-tbody .ant-table-cell .ant-typography {
   font-weight: 400 !important;
-  color: #303e67 !important;
-  font-family: "robotoFlex", sans-serif !important;
+  /* color: #303e67 !important; */
+  font-family: "Internormal", sans-serif !important;
 }
 
 .ant-table-thead > tr > th {
-  padding: 10px !important;
+  padding: 10px 16px !important;
 }
 /* table style end */
 
@@ -745,3 +746,61 @@ textarea {
   height: 32px !important;
   line-height: 32px;
 } */
+
+/* quileditor */
+.ql-editor {
+  /* min-height: 200px !important; */
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+.ql-container {
+  border: 1px solid #ddd;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  max-height: 200px !important;
+  min-height: 150px;
+  overflow-y: auto;
+}
+
+.ql-toolbar.ql-snow {
+  background: #f0ecec;
+}
+
+/* tab */
+.ant-tabs-nav {
+  margin: 0;
+}
+
+/* .ant-tabs-tab {
+  padding: 0.75rem 1rem;
+} */
+
+.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #f5b301 !important;
+  text-shadow: 0 0 0.25px #f5b301 !important;
+  /* font-weight: 600; */
+}
+
+.ant-tabs-ink-bar {
+  background: #f5b301;
+}
+.ant-tabs-tab:hover {
+  color: #f5b301 !important;
+}
+
+.ant-btn:hover,
+.ant-btn:focus {
+  color: #fff !important;
+}
+
+.ant-btn-primary:hover,
+.ant-btn-primary:focus {
+  border: none !important;
+
+  /* background: #f5b301 !important; */
+}
+
+.ant-checkbox-checked .ant-checkbox-inner {
+  background: #f5b301 !important;
+  border: #f5b301 !important;
+}

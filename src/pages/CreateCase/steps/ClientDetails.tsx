@@ -5,15 +5,11 @@
 import * as React from 'react';
 import { getChoiceDropdownOptions } from '../../../Service/getChoice';
 import { CompleteCaseForm } from '../../../Types/Type';
-import DatePickerField from '../../../Components/Formfields/Calendar/CustomCalendar';
-import SelectField from '../../../Components/Formfields/Dropdown/CustomDropdown';
-import RadioBoxGroup from '../../../Components/Formfields/RadioButton/CustomRadioButton';
-import TextAreaField from '../../../Components/Formfields/TextArea/CustomTextArea';
-import TextField from '../../../Components/Formfields/Textfield/CustomTextfield';
-import styles from './Case.module.scss';
+
 import { useState } from 'react';
 import { fetchClientDetails, fetchExistingClient } from '../../../Service/SPServices/CreatecaseService';
 import { constants, initialFormData } from '../../../config/constants';
+import ClientDetailsLayout from '../../../Components/ClientDetail/CustomClientDetail';
 // import { getServicetype } from '../../../Service/getServicetype';
 // import { constants } from '../../../config/constants';
 // import { CaseFormData } from '../types';
@@ -22,18 +18,19 @@ type Props = {
     setFormdata: any;
     onChange: <K extends keyof CompleteCaseForm>(key: K, value: CompleteCaseForm[K]) => void;
     serviceType: any;
-    error?: any
+    error?: any;
+    setFormErrors?: any
 }
 
 
 
-const ClientDetails: React.FC<Props> = ({ data, onChange, serviceType, setFormdata, error }) => {
+const ClientDetails: React.FC<Props> = ({ data, onChange, serviceType, setFormdata, setFormErrors, error }) => {
     const disabled: boolean = data.ClientType?.value === "Existing" ? true : false;
 
 
     const [getChoiceData, setGetChoiceData] = useState<any>([]);
     const [existingClients, setExistingClients] = useState<{ label: string; value: string | number }[]>([]);
-    const [selectedClientId, setSelectedClientId] = useState<{ label: string; value: string | number } | any>(null);    // const [serviceType, setServiceType] = useState<any>([])
+    // const [selectedClientId, setSelectedClientId] = useState<{ label: string; value: string | number } | any>(null);    // const [serviceType, setServiceType] = useState<any>([])
     const fetchChoices = async () => {
         const allOptions = await getChoiceDropdownOptions(["PreferredLanguage", "Refferal", "Religion", "MaritalStatus", "HealthInsurance", "Gender", "ContactPreference", "ContactDetails"]);
         // const serviceType = await getServicetype(constants.Listnames.ServiceType)
@@ -55,6 +52,24 @@ const ClientDetails: React.FC<Props> = ({ data, onChange, serviceType, setFormda
 
     }
 
+    const handleClientTypeChange = (val: any) => {
+        debugger;
+        if (val?.value === "New" && setFormdata && initialFormData) {
+            setFormdata(() => initialFormData);
+        }
+        else {
+            setFormErrors({})
+        }
+        onChange("ClientType", val);
+    };
+
+    const handleExistingClientSelect = async (val: any) => {
+        onChange("ExistingClient", val);
+        if (fetchClientDetails && setFormdata) {
+            await fetchClientDetails(val?.value, setFormdata, val);
+        }
+    }
+
 
     React.useEffect(() => {
         fetchChoices()
@@ -66,471 +81,439 @@ const ClientDetails: React.FC<Props> = ({ data, onChange, serviceType, setFormda
 
     }, [data.ClientType])
     return (
+        // <div>
+        //     <p style={{
+        //         margin: "10px 0px",
+        //         color: "#cccccc",
+        //         fontSize: "13px"
+        //     }}>client name</p>
+
+
+
+        //     <div className={styles.formrow}>
+        //         <div className={data.ClientType?.value === "Existing" ? styles.thirdwidth : styles.halfwidth}>
+        //             <RadioBoxGroup
+        //                 label="Client Type"
+        //                 value={data.ClientType}
+        //                 onChange={(val: any) => {
+        //                     // setSelectedClientId(null);
+        //                     if (val.value === "New") setFormdata(() => initialFormData);
+        //                     onChange("ClientType", val);
+        //                 }}
+        //                 options={[
+        //                     { label: 'New', value: 'New' },
+        //                     { label: 'Existing', value: 'Existing' },
+        //                 ]}
+        //             />
+        //         </div>
+
+        //         <div className={data.ClientType?.value === "Existing" ? styles.thirdwidth : styles.halfwidth}>
+        //             <TextField
+        //                 label="Pronouns"
+        //                 value={data.Pronouns}
+        //                 disabled={disabled}
+        //                 onChange={(val) => onChange("Pronouns", val)}
+        //             />
+        //         </div>
+
+        //         {data.ClientType?.value === "Existing" && (
+        //             <div className={styles.thirdwidth}>
+        //                 <SelectField
+        //                     label="Select Existing Client"
+        //                     options={existingClients}
+        //                     // disabled={disabled}
+        //                     value={data.ExistingClient}
+        //                     error={error.ExistingClient}
+        //                     onChange={async (val: any) => {
+        //                         onChange("ExistingClient", val)
+
+        //                         await fetchClientDetails(val?.value, setFormdata, val);
+        //                     }}
+        //                 />
+        //             </div>
+        //         )}
+        //     </div>
+
+
+        //     <div className={styles.formrow}>
+
+        //         <div className={styles.halfwidth}>
+        //             <TextField label="First name" required value={data.FirstName} onChange={(val) => onChange("FirstName", val)} disabled={disabled} error={error.FirstName} />
+        //         </div>
+        //         <div className={styles.halfwidth}>
+        //             <TextField label="Last name" value={data.LastName} onChange={(val) => onChange("LastName", val)} disabled={disabled} error={error.LastName} required />
+
+        //         </div>
+        //     </div>
+
+        //     <div className={styles.formrow}>
+
+        //         <div className={styles.halfwidth}>
+        //             <TextField label="Preffered name" required value={data.PreferredName} onChange={(val) => { onChange("PreferredName", val) }}
+        //                 disabled={disabled}
+        //                 error={error.PreferredName}
+
+        //             />
+        //         </div>
+        //         <div className={styles.halfwidth}>
+        //             <SelectField
+        //                 label="Gender"
+        //                 value={data.Gender}
+        //                 options={getChoiceData.Gender}
+        //                 disabled={disabled}
+
+        //                 onChange={(val) => onChange("Gender", val)}
+        //             />
+        //         </div>
+        //     </div>
+
+        //     <div className={styles.formrow}>
+
+        //         <div className={styles.halfwidth}>
+        //             <DatePickerField value={data.DateOfBirth} label="Date of birth" onChange={(val) => onChange("DateOfBirth", val)}
+        //                 disabled={disabled}
+
+        //             />
+        //         </div>
+        //         <div className={styles.halfwidth}>
+        //             <TextField label="Age" value={data.Age} onChange={(val) => onChange("Age", val)}
+        //                 disabled={disabled}
+
+        //             />
+
+        //         </div>
+        //     </div>
+
+        //     <div className={styles.formrow}>
+
+        //         <div className={styles.halfwidth}>
+        //             <SelectField multiple label={"Default service type"} options={serviceType} required value={data.ServiceType} onChange={(vals) => onChange("ServiceType", vals)}
+        //                 disabled={disabled}
+        //                 error={error.ServiceType}
+        //             />
+        //         </div>
+        //         <div className={styles.halfwidth}>
+        //             <TextField label="Client Id number" value={data.ClientIDNumber} onChange={(val) => onChange("ClientIDNumber", val)}
+        //                 disabled={disabled}
+        //             />
+
+        //         </div>
+        //     </div>
+
+
+
+
+        //     <div className={styles.formrow}>
+
+        //         <div className={styles.halfwidth}>
+        //             <SelectField
+        //                 label="Preffered language"
+        //                 value={data.PreferredLanguage}
+        //                 disabled={disabled}
+
+        //                 options={getChoiceData?.PreferredLanguage || []}
+        //                 // options={[
+        //                 //     { label: 'male', value: 'male' },
+        //                 //     { label: 'female', value: 'female' },
+
+        //                 // ]}
+        //                 onChange={(val) => onChange("PreferredLanguage", val)}
+        //             />                </div>
+        //         <div className={styles.halfwidth}>
+        //             <TextField label="Employment" value={data.Employment}
+        //                 onChange={(val) => onChange("Employment", val)}
+        //                 disabled={disabled}
+
+
+        //             />
+        //         </div>
+        //     </div>
+        //     <div className={styles.formrow}>
+
+        //         <div className={styles.halfwidth}>
+        //             <TextField label="Income" value={data.Income}
+        //                 onChange={(val) => onChange("Income", val)}
+        //                 disabled={disabled}
+
+
+        //             />               </div>
+        //         <div className={styles.halfwidth}>
+        //             <TextField label="Education" value={data.Education}
+        //                 onChange={(val) => onChange("Education", val)}
+        //                 disabled={disabled}
+
+
+        //             />
+        //         </div>
+        //     </div>
+        //     <div className={styles.formrow}>
+
+        //         <div className={styles.halfwidth}>
+
+        //             <TextField label="Occupation" value={data.Occupation}
+        //                 onChange={(val) => onChange("Occupation", val)}
+        //                 disabled={disabled}
+
+
+        //             />
+        //         </div>
+        //         <div className={styles.halfwidth}>
+        //             <SelectField
+        //                 label="Marital Status"
+        //                 value={data.MaritalStatus}
+        //                 disabled={disabled}
+        //                 options={getChoiceData?.MaritalStatus || []}
+        //                 // options={[
+        //                 //     { label: 'male', value: 'male' },
+        //                 //     { label: 'female', value: 'female' },
+
+        //                 // ]}
+        //                 onChange={(val) => onChange("MaritalStatus", val)}
+        //             />
+        //         </div>
+        //     </div>
+        //     {/* contats */}
+
+        //     <p style={{
+        //         margin: "10px 0px",
+        //         color: "#cccccc",
+        //         fontSize: "13px"
+        //     }}>contacts</p>
+
+
+
+        //     <div>
+
+        //         <div className={styles.formrow}>
+
+        //             <div className={styles.halfwidth}>
+        //                 <TextField label="Home phone" value={data.HomePhone} onChange={(val) => onChange("HomePhone", val)} disabled={disabled} />
+        //             </div>
+        //             <div className={styles.halfwidth}>
+        //                 <TextField label="Mobile phone" required value={data.MobilePhone} onChange={(val) => onChange("MobilePhone", val)} disabled={disabled}
+
+        //                     error={error.MobilePhone}
+
+        //                 />
+
+        //             </div>
+        //         </div>
+        //         <div className={styles.formrow}>
+
+        //             <div className={styles.halfwidth}>
+        //                 <TextField label="Work phone" value={data.WorkPhone} onChange={(val) => onChange("WorkPhone", val)} disabled={disabled} />
+        //             </div>
+        //             <div className={styles.halfwidth}>
+        //                 <TextField label="Email" required value={data.Email} onChange={(val) => { onChange("Email", val) }} disabled={disabled}
+        //                     error={error.Email}
+
+        //                 />
+
+        //             </div>
+        //         </div>
+
+        //         <div className={styles.formrow}>
+
+        //             <div className={styles.halfwidth}>
+        //                 <SelectField
+        //                     label="Contact prefference"
+        //                     value={data.ContactPreference}
+        //                     options={getChoiceData.ContactPreference}
+        //                     disabled={disabled}
+
+        //                     onChange={(val) => onChange("ContactPreference", val)}
+        //                 />                </div>
+        //             <div className={styles.halfwidth}>
+        //                 <SelectField
+        //                     label="Contact Details"
+        //                     value={data.ContactDetails}
+        //                     options={getChoiceData.ContactDetails}
+        //                     disabled={disabled}
+
+        //                     onChange={(val) => onChange("ContactDetails", val)}
+        //                 />
+        //             </div>
+        //         </div>
+
+
+        //     </div>
+
+
+
+        //     <p style={{
+        //         margin: "10px 0px",
+        //         color: "#cccccc",
+        //         fontSize: "13px"
+        //     }}>Address</p>
+
+        //     <div>
+
+        //         <div className={styles.formrow}>
+
+        //             <div className={styles.halfwidth}>
+        //                 <TextField label="Location" value={data.Location} onChange={(val) => onChange("Location", val)} disabled={disabled} />
+        //             </div>
+        //             <div className={styles.halfwidth}>
+        //                 <TextField label="City" value={data.City} onChange={(val) => onChange("City", val)} disabled={disabled} />
+
+        //             </div>
+        //         </div>
+        //         <div className={styles.formrow}>
+
+        //             <div className={styles.halfwidth}>
+        //                 <TextField label="State" value={data.State} onChange={(val) => onChange("State", val)} disabled={disabled} />
+        //             </div>
+        //             <div className={styles.halfwidth}>
+        //                 <TextAreaField label="Address"
+        //                     disabled={disabled} value={data.Address}
+        //                     onChange={(val) => onChange("Address", val)}
+
+        //                 />
+
+        //             </div>
+        //         </div>
+
+        //     </div>
+
+        //     <p style={{
+        //         margin: "10px 0px",
+        //         color: "#cccccc",
+        //         fontSize: "13px"
+        //     }}>Emergency Contacts</p>
+
+        //     <>
+        //         <div className={styles.formrow}>
+
+        //             <div className={styles.halfwidth}>
+        //                 <TextField label="Name"
+        //                     value={data.EName}
+        //                     onChange={(val) => onChange("EName", val)}
+        //                     disabled={disabled}
+
+        //                 />
+        //             </div>
+        //             <div className={styles.halfwidth}>
+        //                 <TextField label="Mobile phone"
+        //                     value={data.EMobilePhone}
+        //                     error={error.EMobilePhone}
+        //                     required
+
+        //                     disabled={disabled}
+        //                     onChange={(val) => onChange("EMobilePhone", val)}
+
+        //                 />
+
+        //             </div>
+        //         </div>
+        //         <div className={styles.formrow}>
+
+        //             <div className={styles.halfwidth}>
+        //                 <TextField label="Relationship"
+        //                     value={data.Relationship}
+        //                     disabled={disabled}
+        //                     onChange={(val) => onChange("Relationship", val)}
+
+
+        //                 />
+        //             </div>
+        //             <div className={styles.halfwidth}>
+        //                 <TextField label="Email"
+        //                     value={data.EEmail}
+        //                     disabled={disabled}
+        //                     error={error.EEmail}
+        //                     required
+
+        //                     onChange={(val) => onChange("EEmail", val)}
+
+        //                 />
+
+        //             </div>
+        //         </div>
+        //     </>
+
+        //     <p style={{
+        //         margin: "10px 0px",
+        //         color: "#cccccc",
+        //         fontSize: "13px"
+        //     }}>Others</p>
+
+        //     <>
+
+
+        //         <div className={styles.formrow}>
+
+        //             <div className={styles.halfwidth}>
+        //                 <SelectField
+        //                     label="Health Insurance"
+        //                     value={data.HealthInsurance}
+        //                     options={getChoiceData?.HealthInsurance || []}
+        //                     disabled={disabled}
+        //                     // options={[
+        //                     //     { label: 'male', value: 'male' },
+        //                     //     { label: 'female', value: 'female' },
+
+        //                     // ]}
+        //                     onChange={(val) => onChange("HealthInsurance", val)}
+        //                 />                </div>
+        //             <div className={styles.halfwidth}>
+        //                 <SelectField
+        //                     label="refferal"
+        //                     value={data.Refferal}
+        //                     options={getChoiceData.Refferal}
+        //                     disabled={disabled}
+
+        //                     onChange={(val) => onChange("Refferal", val)}
+        //                 />
+        //             </div>
+        //         </div>
+
+
+        //         <div className={styles.formrow}>
+
+        //             <div className={styles.halfwidth}>
+        //                 <SelectField
+        //                     label="Maritial Status"
+        //                     value={data.MaritalStatus}
+        //                     disabled={disabled}
+        //                     options={getChoiceData?.MaritialStatus || []}
+        //                     // options={[
+        //                     //     { label: 'male', value: 'male' },
+        //                     //     { label: 'female', value: 'female' },
+
+        //                     // ]}
+        //                     onChange={(val) => onChange("MaritalStatus", val)}
+        //                 />                </div>
+        //             <div className={styles.halfwidth}>
+        //                 <SelectField
+        //                     label="Religion"
+        //                     value={data.Religion}
+        //                     options={getChoiceData?.Religion || []}
+        //                     disabled={disabled}
+        //                     // options={[
+        //                     //     { label: 'male', value: 'male' },
+        //                     //     { label: 'female', value: 'female' },
+
+        //                     // ]}
+        //                     onChange={(val) => onChange("Religion", val)}
+        //                 />
+        //             </div>
+        //         </div>
+        //     </>
+        // </div>
+
+
         <div>
-            <p style={{
-                margin: "10px 0px",
-                color: "#cccccc",
-                fontSize: "13px"
-            }}>client name</p>
-
-            {/* <div className={styles.formrow}>
-
-                <div className={styles.halfwidth}>
-                    <RadioBoxGroup
-                        label="Client Type"
-                        value={data.ClientType}
-                        onChange={(val: any) => {
-                            setSelectedClientId(null)
-                            if (val.value === "New") {
-                                // Reset form to initial state
-                                setFormdata(initialFormData);
-                            }
-
-                            onChange("ClientType", val)
-
-
-                        }}
-                        options={[
-                            { label: 'New', value: 'New' },
-                            { label: 'Existing', value: 'Existing' },
-                        ]}
-                    />
-                </div>
-
-                {data.ClientType?.value === "Existing" && (
-                    <div>
-                        <SelectField
-                            label="Select Existing Client"
-                            options={existingClients}
-                            value={selectedClientId}
-                            onChange={async (val: any) => {
-                                setSelectedClientId(val);
-                                setFormdata((prev: any) => ({
-                                    ...prev,
-                                    clientId: val.value,
-                                }));
-                                await fetchClientDetails(val?.value, setFormdata)
-                            }}
-                        />
-                    </div>
-                )}
-                <div className={styles.halfwidth}>
-                    <TextField label="Pronoun" value={data.Pronouns} required onChange={(val) => onChange("Pronouns", val)} />
-
-                </div>
-            </div> */}
-
-            <div className={styles.formrow}>
-                <div className={data.ClientType?.value === "Existing" ? styles.thirdwidth : styles.halfwidth}>
-                    <RadioBoxGroup
-                        label="Client Type"
-                        value={data.ClientType}
-                        onChange={(val: any) => {
-                            setSelectedClientId(null);
-                            if (val.value === "New") setFormdata(initialFormData);
-                            onChange("ClientType", val);
-                        }}
-                        options={[
-                            { label: 'New', value: 'New' },
-                            { label: 'Existing', value: 'Existing' },
-                        ]}
-                    />
-                </div>
-
-                <div className={data.ClientType?.value === "Existing" ? styles.thirdwidth : styles.halfwidth}>
-                    <TextField
-                        label="Pronouns"
-                        value={data.Pronouns}
-                        disabled={disabled}
-                        onChange={(val) => onChange("Pronouns", val)}
-                    />
-                </div>
-
-                {data.ClientType?.value === "Existing" && (
-                    <div className={styles.thirdwidth}>
-                        <SelectField
-                            label="Select Existing Client"
-                            options={existingClients}
-                            // disabled={disabled}
-                            value={selectedClientId}
-                            onChange={async (val: any) => {
-                                setSelectedClientId(val);
-                                setFormdata((prev: any) => ({
-                                    ...prev,
-                                    clientId: val.value,
-                                }));
-                                await fetchClientDetails(val?.value, setFormdata);
-                            }}
-                        />
-                    </div>
-                )}
-            </div>
-
-
-            <div className={styles.formrow}>
-
-                <div className={styles.halfwidth}>
-                    <TextField label="First name" required value={data.FirstName} onChange={(val) => onChange("FirstName", val)} disabled={disabled} error={error.FirstName} />
-                </div>
-                <div className={styles.halfwidth}>
-                    <TextField label="Last name" value={data.LastName} onChange={(val) => onChange("LastName", val)} disabled={disabled} error={error.LastName} required />
-
-                </div>
-            </div>
-
-            <div className={styles.formrow}>
-
-                <div className={styles.halfwidth}>
-                    <TextField label="Preffered name" required value={data.PreferredName} onChange={(val) => { onChange("PreferredName", val) }}
-                        disabled={disabled}
-                        error={error.PreferredName}
-
-                    />
-                </div>
-                <div className={styles.halfwidth}>
-                    <SelectField
-                        label="Gender"
-                        value={data.Gender}
-                        options={getChoiceData.Gender}
-                        disabled={disabled}
-
-                        onChange={(val) => onChange("Gender", val)}
-                    />
-                </div>
-            </div>
-
-            <div className={styles.formrow}>
-
-                <div className={styles.halfwidth}>
-                    <DatePickerField value={data.DateOfBirth} label="Date of birth" onChange={(val) => onChange("DateOfBirth", val)}
-                        disabled={disabled}
-
-                    />
-                </div>
-                <div className={styles.halfwidth}>
-                    <TextField label="Age" value={data.Age} onChange={(val) => onChange("Age", val)}
-                        disabled={disabled}
-
-                    />
-
-                </div>
-            </div>
-
-            <div className={styles.formrow}>
-
-                <div className={styles.halfwidth}>
-                    <SelectField multiple label={"Default service type"} options={serviceType} required value={data.ServiceType} onChange={(vals) => onChange("ServiceType", vals)}
-                        disabled={disabled}
-                        error={error.ServiceType}
-                    />
-                </div>
-                <div className={styles.halfwidth}>
-                    <TextField label="Client Id number" value={data.ClientIDNumber} onChange={(val) => onChange("ClientIDNumber", val)}
-                        disabled={disabled}
-                    />
-
-                </div>
-            </div>
-
-
-
-
-            <div className={styles.formrow}>
-
-                <div className={styles.halfwidth}>
-                    <SelectField
-                        label="Preffered language"
-                        value={data.PreferredLanguage}
-                        disabled={disabled}
-
-                        options={getChoiceData?.PreferredLanguage || []}
-                        // options={[
-                        //     { label: 'male', value: 'male' },
-                        //     { label: 'female', value: 'female' },
-
-                        // ]}
-                        onChange={(val) => onChange("PreferredLanguage", val)}
-                    />                </div>
-                <div className={styles.halfwidth}>
-                    <TextField label="Employment" value={data.Employment}
-                        onChange={(val) => onChange("Employment", val)}
-                        disabled={disabled}
-
-
-                    />
-                </div>
-            </div>
-            <div className={styles.formrow}>
-
-                <div className={styles.halfwidth}>
-                    <TextField label="Income" value={data.Income}
-                        onChange={(val) => onChange("Income", val)}
-                        disabled={disabled}
-
-
-                    />               </div>
-                <div className={styles.halfwidth}>
-                    <TextField label="Education" value={data.Education}
-                        onChange={(val) => onChange("Education", val)}
-                        disabled={disabled}
-
-
-                    />
-                </div>
-            </div>
-            <div className={styles.formrow}>
-
-                <div className={styles.halfwidth}>
-
-                    <TextField label="Occupation" value={data.Occupation}
-                        onChange={(val) => onChange("Occupation", val)}
-                        disabled={disabled}
-
-
-                    />
-                </div>
-                <div className={styles.halfwidth}>
-                    <SelectField
-                        label="Marital Status"
-                        value={data.MaritalStatus}
-                        disabled={disabled}
-                        options={getChoiceData?.MaritalStatus || []}
-                        // options={[
-                        //     { label: 'male', value: 'male' },
-                        //     { label: 'female', value: 'female' },
-
-                        // ]}
-                        onChange={(val) => onChange("MaritalStatus", val)}
-                    />
-                </div>
-            </div>
-            {/* contats */}
-
-            <p style={{
-                margin: "10px 0px",
-                color: "#cccccc",
-                fontSize: "13px"
-            }}>contacts</p>
-
-
-
-            <div>
-
-                <div className={styles.formrow}>
-
-                    <div className={styles.halfwidth}>
-                        <TextField label="Home phone" value={data.HomePhone} onChange={(val) => onChange("HomePhone", val)} disabled={disabled} />
-                    </div>
-                    <div className={styles.halfwidth}>
-                        <TextField label="Mobile phone" required value={data.MobilePhone} onChange={(val) => onChange("MobilePhone", val)} disabled={disabled}
-
-                            error={error.MobilePhone}
-
-                        />
-
-                    </div>
-                </div>
-                <div className={styles.formrow}>
-
-                    <div className={styles.halfwidth}>
-                        <TextField label="Work phone" value={data.WorkPhone} onChange={(val) => onChange("WorkPhone", val)} disabled={disabled} />
-                    </div>
-                    <div className={styles.halfwidth}>
-                        <TextField label="Email" required value={data.Email} onChange={(val) => { onChange("Email", val) }} disabled={disabled}
-                            error={error.Email}
-
-                        />
-
-                    </div>
-                </div>
-
-                <div className={styles.formrow}>
-
-                    <div className={styles.halfwidth}>
-                        <SelectField
-                            label="Contact prefference"
-                            value={data.ContactPreference}
-                            options={getChoiceData.ContactPreference}
-                            disabled={disabled}
-
-                            onChange={(val) => onChange("ContactPreference", val)}
-                        />                </div>
-                    <div className={styles.halfwidth}>
-                        <SelectField
-                            label="Contact Details"
-                            value={data.ContactDetails}
-                            options={getChoiceData.ContactDetails}
-                            disabled={disabled}
-
-                            onChange={(val) => onChange("ContactDetails", val)}
-                        />
-                    </div>
-                </div>
-
-
-            </div>
-
-
-
-            <p style={{
-                margin: "10px 0px",
-                color: "#cccccc",
-                fontSize: "13px"
-            }}>Address</p>
-
-            <div>
-
-                <div className={styles.formrow}>
-
-                    <div className={styles.halfwidth}>
-                        <TextField label="Location" value={data.Location} onChange={(val) => onChange("Location", val)} disabled={disabled} />
-                    </div>
-                    <div className={styles.halfwidth}>
-                        <TextField label="City" value={data.City} onChange={(val) => onChange("City", val)} disabled={disabled} />
-
-                    </div>
-                </div>
-                <div className={styles.formrow}>
-
-                    <div className={styles.halfwidth}>
-                        <TextField label="State" value={data.State} onChange={(val) => onChange("State", val)} disabled={disabled} />
-                    </div>
-                    <div className={styles.halfwidth}>
-                        <TextAreaField label="Address"
-                            disabled={disabled} value={data.Address}
-                            onChange={(val) => onChange("Address", val)}
-
-                        />
-
-                    </div>
-                </div>
-
-            </div>
-
-            <p style={{
-                margin: "10px 0px",
-                color: "#cccccc",
-                fontSize: "13px"
-            }}>Emergency Contacts</p>
-
-            <>
-                <div className={styles.formrow}>
-
-                    <div className={styles.halfwidth}>
-                        <TextField label="Name"
-                            value={data.EName}
-                            onChange={(val) => onChange("EName", val)}
-                            disabled={disabled}
-
-                        />
-                    </div>
-                    <div className={styles.halfwidth}>
-                        <TextField label="Mobile phone"
-                            value={data.EMobilePhone}
-                            error={error.EMobilePhone}
-                            required
-
-                            disabled={disabled}
-                            onChange={(val) => onChange("EMobilePhone", val)}
-
-                        />
-
-                    </div>
-                </div>
-                <div className={styles.formrow}>
-
-                    <div className={styles.halfwidth}>
-                        <TextField label="Relationship"
-                            value={data.Relationship}
-                            disabled={disabled}
-                            onChange={(val) => onChange("Relationship", val)}
-
-
-                        />
-                    </div>
-                    <div className={styles.halfwidth}>
-                        <TextField label="Email"
-                            value={data.EEmail}
-                            disabled={disabled}
-                            error={error.EEmail}
-                            required
-
-                            onChange={(val) => onChange("EEmail", val)}
-
-                        />
-
-                    </div>
-                </div>
-            </>
-
-            <p style={{
-                margin: "10px 0px",
-                color: "#cccccc",
-                fontSize: "13px"
-            }}>Others</p>
-
-            <>
-
-
-                <div className={styles.formrow}>
-
-                    <div className={styles.halfwidth}>
-                        <SelectField
-                            label="Health Insurance"
-                            value={data.HealthInsurance}
-                            options={getChoiceData?.HealthInsurance || []}
-                            disabled={disabled}
-                            // options={[
-                            //     { label: 'male', value: 'male' },
-                            //     { label: 'female', value: 'female' },
-
-                            // ]}
-                            onChange={(val) => onChange("HealthInsurance", val)}
-                        />                </div>
-                    <div className={styles.halfwidth}>
-                        <SelectField
-                            label="refferal"
-                            value={data.Refferal}
-                            options={getChoiceData.Refferal}
-                            disabled={disabled}
-
-                            onChange={(val) => onChange("Refferal", val)}
-                        />
-                    </div>
-                </div>
-
-
-                <div className={styles.formrow}>
-
-                    <div className={styles.halfwidth}>
-                        <SelectField
-                            label="Maritial Status"
-                            value={data.MaritalStatus}
-                            disabled={disabled}
-                            options={getChoiceData?.MaritialStatus || []}
-                            // options={[
-                            //     { label: 'male', value: 'male' },
-                            //     { label: 'female', value: 'female' },
-
-                            // ]}
-                            onChange={(val) => onChange("MaritalStatus", val)}
-                        />                </div>
-                    <div className={styles.halfwidth}>
-                        <SelectField
-                            label="Religion"
-                            value={data.Religion}
-                            options={getChoiceData?.Religion || []}
-                            disabled={disabled}
-                            // options={[
-                            //     { label: 'male', value: 'male' },
-                            //     { label: 'female', value: 'female' },
-
-                            // ]}
-                            onChange={(val) => onChange("Religion", val)}
-                        />
-                    </div>
-                </div>
-            </>
+            <ClientDetailsLayout
+                data={data}
+                onChange={onChange}
+                error={error}
+                disabled={disabled}
+                existingClients={existingClients}
+                getChoiceData={getChoiceData}
+                serviceType={serviceType}
+                onClientTypeChange={handleClientTypeChange}
+                onExistingClientSelect={handleExistingClientSelect}
+            />
         </div>
     );
 };

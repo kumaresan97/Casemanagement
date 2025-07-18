@@ -1,81 +1,52 @@
-
-
-
 import * as React from 'react';
-import { Skeleton } from 'antd';
+import styles from "../ClientDetail/ClientDetails.module.scss"
+import { CompleteCaseForm } from '../../Types/Type';
+import SelectField from '../Formfields/Dropdown/CustomDropdown';
+import FileUpload from '../Formfields/FileUpload/CustomFileUpload';
+import PeoplePickerField from '../Formfields/PeoplePicker/CustomPeoplePicker';
+import TextAreaField from '../Formfields/TextArea/CustomTextArea';
+import InputField from '../Formfields/Textfield/CustomTextfield';
 
-import { useSelector } from 'react-redux';
-import { CompleteCaseForm } from '../../../Types/Type';
 
-import CaseNotesLayout from '../../../Components/CaseNote/CustomCaseNote';
-
-
-type Props = {
+interface Props {
     data: CompleteCaseForm;
     onChange: <K extends keyof CompleteCaseForm>(key: K, value: CompleteCaseForm[K]) => void;
-    serviceType: any
-    setFormdata?: any
-    error?: any
-    setFormErrors?: any
-
+    error?: Partial<Record<keyof CompleteCaseForm, string>>;
+    serviceType: any[];
+    context: any; // Redux context or SharePoint context for PeoplePicker
+    disabled?: boolean;
 }
 
-const CaseNotes: React.FC<Props> = ({ data, onChange, serviceType, error }) => {
-    const state = useSelector((state: any) => state.data.value)
-    const [isLoading, setIsLoading] = React.useState(false)
-    console.log("setIsLoading: ", setIsLoading);
-
-    if (isLoading) {
-        return (
-            <div>
-                <Skeleton title paragraph={{ rows: 1 }} />
-                <Skeleton.Input style={{ width: '100%', marginBottom: 20 }} active />
-                <div style={{ display: 'flex', gap: '10px' }}>
-                    <Skeleton.Input style={{ width: '50%' }} active />
-                    <Skeleton.Input style={{ width: '50%' }} active />
-                </div>
-                <Skeleton.Input style={{ width: '100%', height: 80, marginTop: 20 }} active />
-                <div style={{ display: 'flex', gap: '10px', marginTop: 20 }}>
-                    <Skeleton.Input style={{ width: '50%' }} active />
-                    <Skeleton.Input style={{ width: '50%' }} active />
-                </div>
-            </div>
-        );
-    }
-
+const CaseNotesLayout: React.FC<Props> = ({
+    data,
+    onChange,
+    error = {},
+    serviceType,
+    context,
+    disabled = false
+}) => {
     return (
         <div>
-
-
-
-
-            <CaseNotesLayout
-                data={data}
-                onChange={onChange}
-                error={error}
-                serviceType={serviceType}
-                context={state}
-            />
-            {/* <p style={{ margin: "10px 0px", color: "#cccccc", fontSize: "14px" }}>Case appointment detail</p>
+            <p style={{ margin: "10px 0px", color: "#cccccc", fontSize: "14px" }}>Case appointment detail</p>
 
             <div className={styles.formrow}>
                 <div className={styles.halfwidth}>
-                    <TextField
+                    <InputField
                         label="Case name"
                         value={data.CaseName}
                         onChange={(val) => onChange("CaseName", val)}
                         required
                         error={error.CaseName}
-
+                        disabled={disabled}
                     />
                 </div>
                 <div className={styles.halfwidth}>
                     <PeoplePickerField
-                        context={state}
+                        context={context}
                         label="Case manager"
                         required
                         error={error.CCaseManager}
-
+                        disabled={disabled}
                         defaultUsers={data.CCaseManager?.email ? [data.CCaseManager.email] : []}
                         onChange={(val: any) => onChange("CCaseManager", val[0])}
                     />
@@ -90,13 +61,14 @@ const CaseNotes: React.FC<Props> = ({ data, onChange, serviceType, error }) => {
                     onChange={(val) => onChange("Description", val)}
                     required
                     error={error.Description}
+                    disabled={disabled}
                 />
             </div>
 
             <div className={styles.formrow}>
                 <div className={styles.halfwidth}>
                     <FileUpload
-                        value={data?.attachments}
+                        value={data.attachments}
                         onFilesSelected={(e: any) => onChange("attachments", e)}
                         label="Attachments"
                     />
@@ -104,17 +76,18 @@ const CaseNotes: React.FC<Props> = ({ data, onChange, serviceType, error }) => {
                 <div className={styles.halfwidth}>
                     <SelectField
                         multiple
-                        error={error.CServiceType}
                         label="Default service type"
-                        options={serviceType}
-                        required
                         value={data.CServiceType}
+                        options={serviceType}
                         onChange={(vals) => onChange("CServiceType", vals)}
+                        error={error.CServiceType}
+                        required
+                        disabled={disabled}
                     />
                 </div>
-            </div> */}
+            </div>
         </div>
     );
 };
 
-export default CaseNotes;
+export default CaseNotesLayout;

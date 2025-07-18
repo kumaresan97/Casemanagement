@@ -3,6 +3,8 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const mainData: any = {
   value: [],
+  selectedCase: null,
+
   currentUserDetails: {
     id: "",
     name: "",
@@ -20,12 +22,16 @@ const MainSPContext: any = createSlice({
     setCurrentUserDetails: (state, payload) => {
       state.currentUserDetails = payload?.payload;
     },
+    setSelectedCase: (state, action) => {
+      state.selectedCase = action.payload;
+    },
   },
 });
 
 export const {
   setMainSPContext,
   setCurrentUserDetails,
+  setSelectedCase,
   setAppDetails,
   setADGroupIDs,
 } = MainSPContext.actions;

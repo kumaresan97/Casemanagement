@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable react/no-unescaped-entities */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import * as React from "react"
 import { useState } from "react";
 import styles from "../Case.module.scss"
@@ -9,49 +14,62 @@ import PeoplePickerField from "../../../Components/Formfields/PeoplePicker/Custo
 import TextAreaField from "../../../Components/Formfields/TextArea/CustomTextArea";
 // import PeoplePickerField from "../../../Components/Formfields/PeoplePicker/CustomPeoplePicker";
 // import TextAreaField from "../../../Components/Formfields/TextArea/CustomTextArea";
-import { useSelector } from "react-redux";
-const caseData = {
-    Id: 101,
-    CaseName: "Jerwin Clients",
-    Date: "2016-09-18",
-    BillableType: { label: "Billable", value: "Billable" },
-    ServiceType: [
-        { label: "H2025: Help with Employment or School", value: "H2025: Help with Employment or School" },
-        { label: "H0043: Housing Related", value: "H0043: Housing Related" }
-    ],
-    CaseManager: {
-        name: "Ronald",
-        email: "ronald@example.com",
-        id: 23
-    },
-    Description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. " +
-        "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, " +
-        "when an unknown printer took a galley."
-};
+import { useDispatch, useSelector } from "react-redux";
+import DatePickerField from "../../../Components/Formfields/Calendar/CustomCalendar";
+import { setSelectedCase } from "../../../redux/feauture/dataSlicer";
+import { getAllCases, UpdatecaseInfo } from "../../../Service/AllCases/AllCaseService";
+import { useParams } from "react-router-dom";
+import { cases } from "../../../Types/Type";
+import moment from "moment";
+import { Cases } from "../../../config/constants";
+
 
 const CaseInfo = () => {
 
+    const { id } = useParams();
     const [isEditMode, setIsEditMode] = useState(false);
-    const [formData, setFormData] = useState(caseData);
-    console.log("setFormData: ", setFormData);
+    const [formData, setFormData] = useState<cases>(Cases)
     const Context = useSelector((state: any) => state.data.value)
+    const selectedCase = useSelector((state: any) => state.data.selectedCase);
 
+    const dispatch = useDispatch();
 
+    const fetchAndStoreCase = async (id: number) => {
+        const result = await getAllCases(id);
+        setFormData(result[0])
+        console.log("result: ", result);
+        if (result?.length > 0) {
+            setFormData(result[0])
+
+            dispatch?.(setSelectedCase(result[0]));
+        }
+    };
     const handleChange = (key: string, value: any) => {
         setFormData((prev: any) => ({ ...prev, [key]: value }));
     };
 
     const handleSave = () => {
+        UpdatecaseInfo(Number(id), formData)
         console.log('Saving...', formData);
         // Call API here
         setIsEditMode(false);
     };
 
     const handleCancel = () => {
-        setFormData(caseData); // Reset form
+        setFormData(selectedCase)
+        // setFormData(caseData); // Reset form
         setIsEditMode(false);
     };
+
+
+    React.useEffect(() => {
+        fetchAndStoreCase(Number(id))
+
+    }, [id])
+
+
+
+
     return (
 
 
@@ -64,17 +82,19 @@ const CaseInfo = () => {
                             {isEditMode ? (
                                 <InputField value={formData?.CaseName}
                                     disableWrapper
+                                    onChange={(val) => handleChange("CaseName", val)}
 
                                 />
                             ) : <span>{formData?.CaseName}</span>}
                         </div>
                     </div>
                     <div className={styles.row}>
-                        <div className={styles.left}>Case Name</div>
+                        <div className={styles.left}>Date</div>
                         <div className={styles.right}>
                             {isEditMode ? (
-                                <InputField
-                                    value={formData?.Date}
+                                <DatePickerField
+                                    label=""
+                                    value={moment(formData?.Date).format("MM/DD/YYYY")}
                                     disableWrapper
                                     onChange={(val) => handleChange("Date", val)}
                                 />
@@ -85,12 +105,12 @@ const CaseInfo = () => {
                     </div>
 
                     <div className={styles.row}>
-                        <div className={styles.left}>Case Name</div>
+                        <div className={styles.left}>BillableType</div>
                         <div className={styles.right}>
                             {isEditMode ? (
                                 <SelectField
                                     disableWrapper
-                                    value={formData.BillableType}
+                                    value={formData?.BillableType}
                                     options={[
                                         { label: "Billable", value: "Billable" },
                                         { label: "Non-billable", value: "Non-billable" }
@@ -98,7 +118,7 @@ const CaseInfo = () => {
                                     onChange={(val) => handleChange("BillableType", val)}
                                 />
                             ) : (
-                                <span>{formData?.BillableType.value || "—"}</span>
+                                <span>{formData?.BillableType?.value || null}</span>
                             )}
                         </div>
                     </div>
@@ -106,24 +126,24 @@ const CaseInfo = () => {
 
                 <div className={styles.rightSection}>
                     <div className={styles.row}>
-                        <div className={styles.left}>Description</div>
+                        <div className={styles.left}>ServiceType</div>
                         <div className={styles.right}>
                             {isEditMode ? (
                                 <SelectField
                                     disableWrapper
                                     multiple
-                                    value={formData?.ServiceType}
-                                    onChange={(val) => handleChange("ServiceType", val)}
-                                    options={caseData.ServiceType}
-                                // options={[
-                                //     { label: "H2025", value: "H2025" },
-                                //     { label: "H0043", value: "H0043" },
-                                // ]}
+                                    value={formData?.CCServiceType}
+                                    onChange={(val) => handleChange("CCServiceType", val)}
+                                    // options={caseData.ServiceType}
+                                    options={[
+                                        { label: "H2025", value: "H2025" },
+                                        { label: "H0043", value: "H0043" },
+                                    ]}
                                 />
-                            ) : Array.isArray(formData?.ServiceType) &&
-                                formData.ServiceType.length > 0 ? (
+                            ) : Array.isArray(formData?.CCServiceType) &&
+                                formData.CCServiceType.length > 0 ? (
                                 <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-                                    {formData.ServiceType.map((s, idx) => (
+                                    {formData.CCServiceType.map((s, idx) => (
                                         <Tag
                                             key={idx}
                                             color="gold"
@@ -146,21 +166,22 @@ const CaseInfo = () => {
                         </div>
                     </div>
                     <div className={styles.row}>
-                        <div className={styles.left}>Description</div>
+                        <div className={styles.left}>CaseManager</div>
                         <div className={styles.right}>
                             {isEditMode ? (
                                 <PeoplePickerField
 
+                                    defaultUsers={formData.CCaseManager?.email ? [formData.CCaseManager.email] : []}
                                     context={Context}
-                                    onChange={(val) => handleChange("CaseManager", val)}
+                                    onChange={(val) => handleChange("CCaseManager", val)}
                                 />
                             ) : (
                                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                                     <Avatar
                                         size="small"
-                                        src={`/_layouts/15/userphoto.aspx?size=S&username=${formData?.CaseManager?.email ?? ""}`}
+                                        src={`/_layouts/15/userphoto.aspx?size=S&username=${formData?.CCaseManager?.email ?? ""}`}
                                     />
-                                    <span>{formData?.CaseManager?.name || "—"}</span>
+                                    <span>{formData?.CCaseManager?.name || "—"}</span>
                                 </div>
                             )}
                         </div>
@@ -170,6 +191,7 @@ const CaseInfo = () => {
                         <div className={styles.right}>
                             {isEditMode ? (
                                 <TextAreaField
+                                    rows={4}
                                     disableWrapper
                                     value={formData?.Description}
                                     onChange={(val) => handleChange("Description", val)}
@@ -194,6 +216,10 @@ const CaseInfo = () => {
                 )}
             </div>
         </div>
+
+
+
+
 
     );
 

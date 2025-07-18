@@ -1,11 +1,9 @@
 import * as React from 'react';
-import styles from "./Case.module.scss"
-import CalendarField from '../../../Components/Formfields/Calendar/CustomCalendar';
-import SelectField from '../../../Components/Formfields/Dropdown/CustomDropdown';
+
 import { CompleteCaseForm } from '../../../Types/Type';
-import TextAreaField from '../../../Components/Formfields/TextArea/CustomTextArea';
-import PeoplePickerField from '../../../Components/Formfields/PeoplePicker/CustomPeoplePicker';
+
 import { useSelector } from 'react-redux';
+import AppointmentLayout from '../../../Components/Appointment/CustomAppointment';
 // import { CaseFormData } from '../types';
 
 // interface Props {
@@ -17,7 +15,8 @@ type Props = {
     setFormdata?: any;
     onChange: <K extends keyof CompleteCaseForm>(key: K, value: CompleteCaseForm[K]) => void;
     serviceType: any;
-    error?: any
+    error?: any;
+    setFormErrors?: any
 }
 
 const Appointment: React.FC<Props> = ({ data, onChange, serviceType, error }) => {
@@ -25,7 +24,17 @@ const Appointment: React.FC<Props> = ({ data, onChange, serviceType, error }) =>
 
     return (
         <div>
-            <p style={{
+
+
+
+            <AppointmentLayout
+                data={data}
+                onChange={onChange}
+                serviceType={serviceType}
+                error={error}
+                context={Context}
+            />
+            {/* <p style={{
                 margin: "10px 0px",
                 color: "#cccccc",
                 fontSize: "13px"
@@ -96,7 +105,7 @@ const Appointment: React.FC<Props> = ({ data, onChange, serviceType, error }) =>
                     onChange={(val) => onChange("CaseNotes", val)}
                     required
                 />
-            </div>
+            </div> */}
         </div>
     );
 };

@@ -36,9 +36,13 @@ export const validateStep = (
     }
 
     if (
-      ["Gender", "ClientType", "PreferredLanguage", "BillableType"].includes(
-        field
-      ) &&
+      [
+        "Gender",
+        "ClientType",
+        "PreferredLanguage",
+        "BillableType",
+        "ExistingClient",
+      ].includes(field) &&
       !isValidSelect(value)
     ) {
       fieldErrors[field] = `${field} is required`;

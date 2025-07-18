@@ -171,7 +171,7 @@ const CreateNewCase: React.FC<CreateNewCaseProps> = ({ mode, initialData }) => {
         {
             title: 'Client Details',
             component: ClientDetails,
-            requiredFields: formData?.ClientType?.value === "Existing" ? [] : ['FirstName', 'LastName', 'PreferredName', 'ServiceType', 'MobilePhone', 'Email', 'EEmail', 'EMobilePhone'],
+            requiredFields: formData?.ClientType?.value === "Existing" ? ["ExistingClient"] : ['FirstName', 'LastName', 'PreferredName', 'ServiceType', 'MobilePhone', 'Email', 'EEmail', 'EMobilePhone'],
         },
         {
             title: 'Case Notes',
@@ -205,6 +205,7 @@ const CreateNewCase: React.FC<CreateNewCaseProps> = ({ mode, initialData }) => {
 
 
     const handleNext = () => {
+        debugger;
         const { valid, fieldErrors } = validateStep(currentStep, steps, formData);
 
         if (!valid) {
@@ -241,8 +242,8 @@ const CreateNewCase: React.FC<CreateNewCaseProps> = ({ mode, initialData }) => {
             }
 
             setTimeout(() => {
-                alert('Case submitted successfully!');
-                navigate('/');
+                // alert('Case submitted successfully!');
+                navigate('/AllCases');
             }, 1000);
         } catch (error) {
             console.error('Submit Error:', error);
@@ -339,7 +340,7 @@ const CreateNewCase: React.FC<CreateNewCaseProps> = ({ mode, initialData }) => {
                         <h3>{title}</h3>
                     </div>
                     <div className={styles.stepBody}>
-                        <CurrentStepComponent data={formData} onChange={handleChange} serviceType={serviceType} setFormdata={setFormData} error={formErrors} />
+                        <CurrentStepComponent data={formData} onChange={handleChange} serviceType={serviceType} setFormdata={setFormData} error={formErrors} setFormErrors={setFormErrors} />
                     </div>
                     {/* <CurrentStepComponent data={formData} onChange={handleChange} /> */}
 

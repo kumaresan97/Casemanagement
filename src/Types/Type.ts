@@ -3,6 +3,7 @@ export interface ListName {
   CaseDetails: string;
   Appointments: string;
   ServiceType: string;
+  CaseNotes: string;
 }
 
 export interface SelectOption {
@@ -75,6 +76,7 @@ export interface CompleteCaseForm {
   CCaseManager: PeoplePickerUser | null;
   ACaseManager: PeoplePickerUser | null;
   CaseManagerId?: number | any;
+  ExistingClient?: SelectOption | null;
 }
 
 export interface cases {
@@ -86,8 +88,85 @@ export interface cases {
   ClientId?: number | null;
   Status?: string;
   Date?: string | Date;
+  ClientDetails?: any;
+  BillableType?: SelectOption | null;
 }
 interface AttachmentFile {
   name: string;
   content: File | Blob;
+}
+
+export interface CaseNoteItem {
+  type: string;
+  date: string;
+  content: string;
+  billable: boolean;
+}
+
+export interface GroupedNotes {
+  month: string;
+  items: CaseNoteItem[];
+}
+
+// case manager interfaces
+
+export interface ICaseManagersDetails {
+  UserId: number;
+  UserEmail: string;
+  UserName: string;
+  CaseCount: number;
+}
+
+export interface IClientDetails {
+  id: number;
+  firstName: string;
+  lastName: string;
+  preferredName: string;
+}
+export interface IBillableInfoDetails {
+  Id: number;
+  Case: SelectOption;
+  AppointmentSDateTime: string;
+  AppointmentEDateTime: string;
+  CreadedBy: PeoplePickerUser | null;
+  ServiceTypes: SelectOption[];
+  CaseManager: PeoplePickerUser | null;
+  BillableType: SelectOption;
+  Notes: string;
+  Type: string;
+  ClientDetails: IClientDetails;
+  CreatedAt: string;
+  CaseStatus: string;
+}
+export interface IAppointmentDetails {
+  Id: number;
+  Case: SelectOption;
+  AppointmentSDateTime: string;
+  AppointmentEDateTime: string;
+  CreadedBy: PeoplePickerUser | null;
+  ServiceTypes: SelectOption[];
+  CaseManager: PeoplePickerUser | null;
+  BillableType: SelectOption;
+  Notes: string;
+}
+export interface IClientDetails {
+  Id: number;
+  FirstNanme: string;
+  LastName: string;
+  Gender: SelectOption;
+  DateOfBirth: string;
+  ServiceTypes: SelectOption[];
+  ClientID: string;
+  HomePhoneNo: string;
+  MobilePhoneNo: string;
+  WorkPhoneNo: string;
+  EmailId: string;
+  Location: string;
+  City: string;
+  State: string;
+  Address: string;
+  HealthInsurance: SelectOption;
+  Referral: SelectOption;
+  maritalStatus: SelectOption;
+  Religion: string;
 }

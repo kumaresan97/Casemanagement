@@ -1,0 +1,183 @@
+.fc .fc-daygrid-day-top{
+    flex-direction: row !important;
+}
+.fc .fc-toolbar-title{
+    font-size: 17px;
+    color: #b78e1a;
+}
+.fc-view-harness{
+    height: 65vh !important;
+    overflow: auto;
+}
+table thead .fc-scroller{
+    overflow: auto !important;
+}
+.fc .fc-button{
+    border-radius: 50px;
+}
+.fc .fc-button::first-letter{
+    text-transform: uppercase;
+}
+.fc-today-button{
+    font-weight: 600 !important;
+    padding: 5px 15px !important;
+}
+/* next button  */
+
+.fc-next-button, .fc-prev-button, .fc-today-button{
+    background-color: transparent !important;
+    border: none !important;
+    color: #2e2258 !important;
+}
+.fc-next-button:hover, .fc-prev-button:hover, .fc-today-button:hover{
+    background-color: #f8f1dd !important;
+    color: #2e2258 !important;
+   box-shadow: none !important;
+}
+.fc-next-button:focus, .fc-prev-button:focus, .fc-today-button:focus{
+    background-color: transparent !important;
+    color: #2e2258 !important;
+    box-shadow: none !important;
+}
+
+
+.fc .fc-toolbar.fc-header-toolbar{
+    margin-bottom: 5px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #d6d6d6;
+}
+.fc th{
+    border: none !important;
+    text-align: start !important;
+}
+.fc-theme-standard .fc-scrollgrid{
+    border: none !important;
+}
+.fc-theme-standard td{
+    border: none !important;
+    padding: 5px 0px;
+}
+.fc .fc-col-header-cell-cushion{
+    color: #000;
+}
+.fc .fc-daygrid-day-number{
+    color: #000;
+}
+.fc .fc-daygrid-day.fc-day-today{
+    padding: 5px;
+    background-color: #cfa21e;
+    border-radius: 10px;
+}
+.fc-daygrid-dot-event:hover{
+    background-color: transparent !important;
+}
+.fc-daygrid-event-harness{
+    padding-right: 5px;
+}
+.fc-h-event{
+    background-color: transparent;
+    border: none;
+}
+.custom-event-wrapper{
+    width: 100%;
+    padding: 5px 10px;
+    background-color: #f8f1dd;
+    border-radius: 0px 5px 5px 0px;
+    border-left: 3px solid #cfa21e;
+}
+.event-title-text{
+    white-space: normal;
+    /* color: #a57e0b; */
+    color: #93741b;
+    font-weight: 500;
+    font-size: 13px;
+    word-break: break-all;
+    line-height: 13px;
+    margin-bottom: 5px;
+}
+.event-time-text{
+    white-space: normal;
+    color: #7e92a5;
+    font-size: 10px;
+}
+.event-creater-text{
+    white-space: normal;
+    color: #2c3e50;
+    font-size: 11px;
+    font-weight: 500;
+    float: right;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+.fc-day-today .custom-event-wrapper{
+    padding: 5px;
+    background-color: #f8f1dd;
+    border-radius: 5px;
+    /* border-left: 2px solid #cfa21e; */
+}
+.fc-day-today .event-title-text{
+    white-space: normal;
+    color: #93741b;
+    font-weight: 500;
+    font-size: 13px;
+    word-break: break-all;
+    line-height: 13px;
+    margin-bottom: 5px;
+}
+.fc-day-today .event-time-text{
+    white-space: normal;
+    color: #7e92a5;
+    font-size: 10px;
+}
+.fc-day-today .event-creater-text{
+    white-space: normal;
+    color: #2c3e50;
+    font-size: 11px;
+    font-weight: 500;
+    float: right;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+.fc-direction-ltr .fc-daygrid-more-link{
+    float: right !important;
+    color: #2e2258;
+    font-weight: 500;
+}
+.fc-event-selected::after,
+.fc-event:focus::after{
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+
+
+.upcoming-appointments-wrapper .ant-card-body{
+    padding: 5px 10px;
+    border: 1px solid #d6d6d6a3;
+    border-radius: 0px 5px 5px 0px;
+}
+
+
+
+/* Ant modal styles */
+
+.ant-modal-content{
+    border-radius: 10px !important;
+}
+.ant-modal-header{
+    border-radius: 10px !important;
+}
+.ant-modal-title{
+    font-weight: 600;
+}
+
+
+.ant-picker-now{
+    display: none !important;
+}

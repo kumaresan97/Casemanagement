@@ -1,6 +1,3 @@
-
-
-
 // import * as React from 'react';
 // import { Select } from 'antd';
 
@@ -8,7 +5,6 @@
 //     label: string;
 //     value: any;
 // }
-
 
 // interface FieldProps {
 //     label: string;
@@ -53,9 +49,6 @@
 // };
 
 // export default SelectField;
-
-
-
 
 // import * as React from 'react';
 // import { Select } from 'antd';
@@ -124,78 +117,81 @@
 
 // export default SelectField;
 
-
-
-import * as React from 'react';
-import { Select } from 'antd';
+import * as React from "react";
+import { Select } from "antd";
 
 interface Option {
-    label: string;
-    value: any;
+  label: string;
+  value: any;
 }
 
 interface FieldProps {
-    label?: string;
-    required?: boolean;
-    value?: any;
-    error?: string;
-    onChange?: (value: any) => void;
-    options?: Option[];
-    multiple?: boolean;
-    placeholder?: string;
-    disabled?: boolean;
-    disableWrapper?: boolean;
+  label?: string;
+  required?: boolean;
+  value?: any;
+  error?: string;
+  onChange?: (value: any) => void;
+  options?: Option[];
+  multiple?: boolean;
+  placeholder?: string;
+  disabled?: boolean;
+  disableWrapper?: boolean;
 }
 
 const SelectField: React.FC<FieldProps> = ({
-    label,
-    required,
-    value,
-    error,
-    onChange,
-    options = [],
-    multiple = false,
-    placeholder = 'Select',
-    disabled = false,
-    disableWrapper = false
+  label,
+  required,
+  value,
+  error,
+  onChange,
+  options = [],
+  multiple = false,
+  placeholder = "Select",
+  disabled = false,
+  disableWrapper = false,
 }) => {
-    const handleChange = (val: any) => {
-        if (multiple) {
-            const selected = options.filter((opt) => val.includes(opt.value));
-            onChange?.(selected); // return array of full objects
-        } else {
-            const selected = options.find((opt) => opt.value === val);
-            onChange?.(selected || null); // return full object
-        }
-    };
+  console.log("disabled", disabled);
 
-    // Convert value back to just value(s) for Select component
-    const selectValue = multiple
-        ? Array.isArray(value) ? value.map((v: any) => v?.value) : []
-        : value?.value ?? undefined;
+  const handleChange = (val: any) => {
+    if (multiple) {
+      const selected = options.filter((opt) => val.includes(opt.value));
+      onChange?.(selected); // return array of full objects
+    } else {
+      const selected = options.find((opt) => opt.value === val);
+      onChange?.(selected || null); // return full object
+    }
+  };
 
-    return (
-        <div className={disableWrapper ? "" : "field-wrapper"}>
-            {label &&
-                <label className="label">
-                    {label} {required && <span className="required-star">*</span>}
-                </label>
-            }
-            <Select
-                mode={multiple ? 'multiple' : undefined}
-                value={selectValue}
-                onChange={handleChange}
-                options={options}
-                placeholder={placeholder}
-                style={{ width: '100%' }}
-                disabled={disabled}
-            />
-            {error && <div className="error-message">{error}</div>}
-        </div>
-    );
+  // Convert value back to just value(s) for Select component
+  const selectValue = multiple
+    ? Array.isArray(value)
+      ? value.map((v: any) => v?.value)
+      : []
+    : value?.value ?? undefined;
+
+  return (
+    <div className={disableWrapper ? "" : "field-wrapper"}>
+      {label && (
+        <label className="label">
+          {label} {required && <span className="required-star">*</span>}
+        </label>
+      )}
+      <Select
+        mode={multiple ? "multiple" : undefined}
+        value={selectValue}
+        onChange={handleChange}
+        options={options}
+        placeholder={placeholder}
+        style={{ width: "100%" }}
+        disabled={disabled}
+      />
+      {error ? (
+        <div className="error-message">{error}</div>
+      ) : (
+        <div style={{ height: "23px" }}></div>
+      )}
+    </div>
+  );
 };
 
 export default SelectField;
-
-
-

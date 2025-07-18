@@ -1,0 +1,61 @@
+.billing_info_Container {
+    width: 100%;
+}
+.billable_info_wrapper {
+    border: 1px solid #e0e0e0;
+    padding: 15px 20px 20px 20px;
+    border-radius: 15px;
+    height: 77vh;
+    display: flex;
+    flex-direction: column;
+    .billable_info_sec_title{
+        font-size: 14px;
+        font-weight: 600;
+        color: #cfa21e;
+        margin-bottom: 10px;
+    }
+    .billing_info_grid{
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid #e0e0e0;
+        margin-bottom: 10px;
+    }
+    .close_btn{
+        margin: auto 0 0 auto;
+        button{
+            border-radius: 50px;
+            border: 1px solid #000;
+            padding: 2px 20px;
+            color: #000;
+            font-weight: 500;
+            background-color: transparent;
+        }
+    }
+}
+.billable_info_label {
+    color: #adadad;
+    font-size: 14px;
+    font-weight: 400;
+    margin-bottom: 4px;
+}
+
+.billable_info_text {
+    color: #303e67;
+    font-size: 15px;
+    font-weight: 500;
+}
+.billable_info_notes{
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    min-height: 100px;
+    max-height: 300px;
+    overflow: auto;
+    padding: 10px 15px;
+    p{
+        color: #303e67;
+        font-size: 14px;
+    }
+}

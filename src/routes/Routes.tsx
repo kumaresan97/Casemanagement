@@ -11,10 +11,10 @@ import Eligibility from "../pages/Allcases/Tabs/Eligibility";
 import TreatmentPlans from "../pages/Allcases/Tabs/TreatmentPlan";
 import CreateNewCase from "../pages/CreateCase/CreateNewCase";
 import Dashboard from "../pages/Dashboard/Dashboard";
-import Client from "../pages/Client/Client";
 import CaseManagers from "../pages/CaseManagers/CaseManagers";
 import BillingInfo from "../pages/BillingInfo/BillingInfo";
 import Appointments from "../pages/Appointments/Appointments";
+import Clients from "../pages/Clients/Clients";
 
 const router = createHashRouter([
   {
@@ -37,7 +37,7 @@ const router = createHashRouter([
           { path: "notes", element: <CaseNotes /> },
         ],
       },
-      { path: "clients", element: <Client /> },
+      { path: "clients", element: <Clients /> },
       {
         path: "case-manager",
         element: <CaseManagers />,

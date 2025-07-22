@@ -1,0 +1,62 @@
+.clients_Container {
+    width: 100%;
+}
+.client_form_wrapper {
+    border: 1px solid #e0e0e0;
+    padding: 15px 20px 20px 20px;
+    border-radius: 15px;
+    height: 77vh;
+    display: flex;
+    flex-direction: column;
+    .Client_form_section{
+        height: 95%;
+        overflow: auto;
+    }
+    .client_form_sec_title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #cfa21e;
+        // margin-bottom: 10px;
+    }
+    .client_form_grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        // gap: 10px;
+        padding: 15px 20px 0px 20px;
+        // border-radius: 10px;
+        // border: 1px solid #e0e0e0;
+        // margin-bottom: 10px;
+        .margin_right{
+            margin-right: 50px;
+        }
+    }
+}
+
+.calcelBtn{
+    border: none;
+    background-color: transparent;
+    text-decoration: underline;
+}
+
+.btn {
+    border-radius: 20px !important;
+    display: flex;
+    align-items: center;
+    background-color: #b78e1a !important;
+
+    box-shadow: "none" !important;
+    outline: "none" !important;
+
+    border: none !important;
+    // border: 1px solid #cfa21e4d !important;
+    color: #ffff;
+    font-size: 14px;
+    font-weight: 500;
+
+    &:hover {
+        background-color: #b78e1a !important;
+        // border: 1px solid #cfa21e4d !important;
+        box-shadow: none !important;
+        cursor: pointer;
+    } 
+}

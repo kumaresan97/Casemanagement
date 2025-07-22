@@ -10,6 +10,7 @@ interface FieldProps {
   rows?: number;
   disableWrapper?: boolean;
   disabled?: boolean;
+  readOnly?: boolean;
 }
 
 const TextAreaField: React.FC<FieldProps> = ({
@@ -21,6 +22,7 @@ const TextAreaField: React.FC<FieldProps> = ({
   disableWrapper,
   onChange,
   disabled,
+  readOnly,
 }) => {
   return (
     <div className={disableWrapper ? "" : "field-wrapper"}>
@@ -34,6 +36,7 @@ const TextAreaField: React.FC<FieldProps> = ({
         value={value}
         onChange={(e) => onChange?.(e.target.value)}
         disabled={disabled}
+        readOnly={readOnly}
       />
       {error ? (
         <div className="error-message">{error}</div>

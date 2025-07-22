@@ -41,6 +41,7 @@
     "@fullcalendar/daygrid": "^6.1.17",
     "@fullcalendar/timegrid": "^6.1.17",
     "@fullcalendar/react": "^6.1.17",
+    "@fullcalendar/interaction": "^6.1.17",
     "react-quill": "^2.0.0"
   },
   "devDependencies": {

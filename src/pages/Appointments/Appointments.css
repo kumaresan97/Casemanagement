@@ -170,6 +170,14 @@ table thead .fc-scroller {
 
 .ant-modal-content {
   border-radius: 10px !important;
+  /* height: 83vh !important; */
+  /* min-height: 10vh;
+  max-height: 83vh; */
+}
+.ant-modal-body{
+  min-height: 10vh;
+  max-height: 65vh;
+  overflow: auto;
 }
 .ant-modal-header {
   border-radius: 10px !important;

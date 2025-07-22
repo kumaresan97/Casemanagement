@@ -19,6 +19,7 @@ import { cases, IAppointmentDetails } from "../../Types/Type";
 import "./Appointments.css";
 import {
   addNewAppointment,
+  deleteAppointment,
   fetchAppointmentDetails,
   fetchCaseDeatils,
   updateAppointment,
@@ -32,14 +33,22 @@ import "../../assets/css/style.css";
 import SelectField from "../../Components/Formfields/Dropdown/CustomDropdown";
 import CustomCalendarDateTime from "../../Components/Formfields/CalendarDateTime/CustomCalendarDateTime";
 import InputField from "../../Components/Formfields/Textfield/CustomTextfield";
-import TextAreaField from "../../Components/Formfields/TextArea/CustomTextArea";
+// import TextAreaField from "../../Components/Formfields/TextArea/CustomTextArea";
 import * as moment from "moment";
 import { useSelector } from "react-redux";
+import CustomEditor from "../../Components/QuilEditor/CustomQuilEditor";
+import CustomMessage from "../../Components/Message/Message";
+
+const toastDetails = {
+  IsShow: false,
+  Type: "",
+  Message: "",
+};
 
 const appointmentDetails = {
   Id: 0,
   Case: {
-    value: 0,
+    value: null as number | null,
     label: "",
   },
   ServiceTypes: [] as any[], // Explicitly type as any[]
@@ -66,6 +75,7 @@ const Appointments: React.FC = () => {
   );
   console.log("currentUserDetails", currentUserDetails);
 
+  const [toastMessage, setToastMessage] = useState(toastDetails);
   const [formData, setFormData] = useState(appointmentDetails);
   const [responseState, setResponseState] = useState<{
     key: string;
@@ -86,12 +96,15 @@ const Appointments: React.FC = () => {
     IAppointmentDetails[]
   >([]);
   const [popupControl, setPopupControl] = useState<boolean>(false);
+  const [delPopupControl, setDelPopupControl] = useState<boolean>(false);
+  const [deleteApptId, setDeleteApptId] = useState<number>(0);
   console.log("masterAppointments", masterAppointments);
   console.log("tempAppointments", tempAppointments);
   console.log("upComingAppointments", upComingAppointments);
   console.log("popupControl", popupControl);
   console.log("caseDetails", caseDetails);
   console.log("formData", formData);
+  console.log("deleteApptId", deleteApptId);
 
   const onButtonClick = () => {
     setPopupControl(true);
@@ -281,11 +294,15 @@ const Appointments: React.FC = () => {
   const handleOk = () => {
     setTimeout(() => {
       setPopupControl(false);
+      setDelPopupControl(false);
+      setDeleteApptId(0);
     }, 3000);
   };
 
   const handleCancel = () => {
     setPopupControl(false);
+    setDelPopupControl(false);
+    setDeleteApptId(0);
   };
 
   const handleChange = (key: string, value: any) => {
@@ -316,14 +333,16 @@ const Appointments: React.FC = () => {
           setMasterAppointments,
           setTempAppointments,
           currentUserDetails,
-          setPopupControl
+          setPopupControl,
+          setToastMessage
         );
       } else {
         updateAppointment(
           formData,
           setMasterAppointments,
           setTempAppointments,
-          setPopupControl
+          setPopupControl,
+          setToastMessage
         );
       }
     } else {
@@ -332,6 +351,17 @@ const Appointments: React.FC = () => {
         errorMessage: result.error?.errorMessage,
       });
     }
+  };
+
+  const deleteAppointmentFunction = () => {
+    deleteAppointment(
+      deleteApptId,
+      setMasterAppointments,
+      setTempAppointments,
+      setDelPopupControl,
+      setDeleteApptId,
+      setToastMessage
+    );
   };
 
   const getAppointmentStatus = (
@@ -353,6 +383,12 @@ const Appointments: React.FC = () => {
 
   return (
     <div className={styles.appointments_Container}>
+      <CustomMessage
+        IsShow={toastMessage?.IsShow}
+        Type={toastMessage?.Type}
+        Message={toastMessage?.Message}
+        setToast={setToastMessage}
+      />
       <PageHeader
         title="Appointments"
         showFilter
@@ -543,7 +579,10 @@ const Appointments: React.FC = () => {
                         </CustomTooltip>
                         <CustomTooltip title="Delete">
                           <DeleteIcon
-                            onClick={() => console.log("Delete")}
+                            onClick={() => {
+                              setDelPopupControl(true);
+                              setDeleteApptId(Number(appt?.Id));
+                            }}
                             sx={{
                               cursor: "pointer",
                               backgroundColor: "#ffebee",
@@ -709,14 +748,51 @@ const Appointments: React.FC = () => {
             </div>
           </div>
           <div style={{ width: "100%" }}>
-            <TextAreaField
+            {/* <TextAreaField
               label="Case notes"
               rows={3}
               value={formData?.Notes}
               onChange={(val) => handleChange("Notes", val)}
+            /> */}
+            <CustomEditor
+              value={formData.Notes}
+              onChange={(val) => handleChange("Notes", val)}
+              label="Notes"
             />
           </div>
         </div>
+      </Modal>
+      <Modal
+        open={delPopupControl}
+        width={"30%"}
+        title="Appointment Details"
+        // title={[
+        //   <div>
+        //     <h3>Appointment Details</h3>
+        //   </div>,
+        // ]}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={[
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <button
+              className={styles.calcelBtn}
+              type="button"
+              onClick={handleCancel}
+            >
+              No
+            </button>
+            <Button
+              type="primary"
+              onClick={() => deleteAppointmentFunction()}
+              className={styles.btn}
+            >
+              Yes
+            </Button>
+          </div>,
+        ]}
+      >
+        Are you sure want to delte the appointment?
       </Modal>
     </div>
   );

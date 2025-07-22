@@ -422,9 +422,9 @@ textarea {
 }
 
 /* formField.scss */
-.field-wrapper {
-  /* margin-bottom: 12px; */
-}
+/* .field-wrapper {
+  margin-bottom: 12px;
+} */
 
 .label {
   display: inline-block;

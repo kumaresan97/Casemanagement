@@ -132,7 +132,7 @@ import { handleSubmitData } from '../../Service/SPServices/CreatecaseService';
 import { getServicetype } from '../../Service/getServicetype';
 import { validateStep } from '../../utils/ValidateStep';
 import { useNavigate } from 'react-router-dom';
-import CustomLoader from '../../Components/Loader/Loader';
+import Loader from '../../Components/Spinner/Loader';
 const activeStepIcon = require('../../assets/png/Rounddot.png');
 const completedStepIcon = require('../../assets/png/Checkmark.png');
 const upcomingIcon = require('../../assets/png/Upcoming.png');
@@ -276,7 +276,8 @@ const CreateNewCase: React.FC<CreateNewCaseProps> = ({ mode, initialData }) => {
     }, [])
 
     if (loading) {
-        return <CustomLoader message="Submitting case..." />;
+        // return <CustomLoader message="Submitting case..." />;
+        return <Loader />;
     }
 
     const CurrentStepComponent = steps[currentStep].component;

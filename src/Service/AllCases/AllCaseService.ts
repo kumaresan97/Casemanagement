@@ -545,8 +545,8 @@ export const loadDataByCaseId = async (caseId: number) => {
 };
 export const updateTreatmentPlan = async (
   id: number,
-  data: ITreatmentPlan,
-  setisLoading: any
+  data: ITreatmentPlan
+  // setisLoading?: any
 ) => {
   try {
     const payload = {
@@ -563,11 +563,11 @@ export const updateTreatmentPlan = async (
       RequestJSON: payload,
     });
     alert("updated");
-    setisLoading(false);
+    // setisLoading(false);
 
     return result;
   } catch (error) {
-    setisLoading(false);
+    // setisLoading(false);
 
     console.error("Error updating treatment plan:", error);
     throw error;
@@ -576,8 +576,8 @@ export const updateTreatmentPlan = async (
 
 export const addTreatmentPlan = async (
   data: ITreatmentPlan,
-  id: number,
-  setisLoading: any
+  id: number
+  // setisLoading: any
 ) => {
   try {
     const payload = {
@@ -593,10 +593,10 @@ export const addTreatmentPlan = async (
       RequestJSON: payload,
     });
     alert("added");
-    setisLoading(false);
+    // setisLoading(false);
     return result;
   } catch (error) {
-    setisLoading(false);
+    // setisLoading(false);
 
     console.error("Error adding treatment plan:", error);
     throw error;
@@ -618,4 +618,98 @@ export const validateTreatmentPlan = (
     isValid: Object.keys(errors).length === 0,
     errors,
   };
+};
+
+//Eligiblity
+
+export const fetchEligibilityConfigs = async () => {
+  const res = await SpServices.SPReadItems({
+    Listname: constants.Listnames.EligibilityConfig,
+    Select: "*,Id, Eligibility, CriteriaPoints, Description, MarkAsMain",
+  });
+  return res;
+
+  // return await sp.web.lists
+  //   .getByTitle("EligibilityConfig")
+  //   .items.select("Id", "Eligibility", "CriteriaPoints", "Description", "MarkAsMain")
+  //   .get();
+};
+
+export const fetchEligibilityCheckpoints = async (eligibility: string) => {
+  const items = await SpServices.SPReadItems({
+    Listname: constants.Listnames.EligibilityConfig,
+    Select: "*",
+    // Expand: "Eligibility",
+    Filter: [
+      {
+        FilterKey: "Eligibility",
+        Operator: "eq",
+        FilterValue: `${eligibility.trim()}`,
+      },
+    ],
+  });
+  return items;
+  // return await sp.web.lists
+  //   .getByTitle("EligibilityConfig")
+  //   .items.select("Id", "Eligibility", "CriteriaPoints", "Description")
+  //   .filter(`Eligibility eq '${eligibility.trim()}'`)
+  //   .get();
+};
+
+export const fetchExistingEligibility = async (caseId: number) => {
+  const items = await SpServices.SPReadItems({
+    Listname: constants.Listnames.Eligibility,
+    Select:
+      "*,Id, Status, Comments, EligibilityCheckPoints/ID, Eligibility/ID, Case/Id",
+    Expand: "Case,Eligibility,EligibilityCheckPoints",
+    Filter: [
+      {
+        FilterKey: "CaseId",
+        Operator: "eq",
+        FilterValue: caseId,
+      },
+    ],
+    Topcount: 1,
+  });
+  // const results = await sp.web.lists
+  //   .getByTitle("Eligibility")
+  //   .items.select("Id", "Status", "Comments", "EligibilityCheckPoints/ID", "Eligibility/ID", "Case/Id")
+  //   .expand("Eligibility", "EligibilityCheckPoints", "Case")
+  //   .filter(`CaseId eq ${caseId}`)
+  //   .top(1)
+  //   .get();
+
+  return items.length > 0 ? items[0] : null;
+};
+
+export const createEligibilityEntry = async (payload: any) => {
+  let res = SpServices.SPAddItem({
+    Listname: constants.Listnames.Eligibility,
+    RequestJSON: payload,
+  });
+  return res;
+
+  // return await sp.web.lists.getByTitle("Eligibility").items.add(payload);
+};
+
+export const updateEligibilityEntry = async (id: number, payload: any) => {
+  const res = SpServices.SPUpdateItem({
+    Listname: constants.Listnames.Eligibility,
+    ID: id,
+    RequestJSON: payload,
+  });
+
+  return res;
+};
+//   return await sp.web.lists
+//     .getByTitle("Eligibility")
+//     .items.getById(id)
+//     .update(payload);
+// };
+
+export const recycleEligibilityEntry = async (id: number) => {
+  return await sp.web.lists
+    .getByTitle("Eligibility")
+    .items.getById(id)
+    .recycle();
 };

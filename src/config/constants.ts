@@ -8,6 +8,8 @@ export namespace constants {
     ServiceType: "ServiceType",
     CaseNotes: "CaseNotes",
     Diagnostics: "Diagnostics",
+    EligibilityConfig: "EligibilityConfig",
+    Eligibility: "Eligibility",
   };
 }
 

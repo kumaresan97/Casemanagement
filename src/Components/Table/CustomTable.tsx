@@ -24,7 +24,12 @@ const CommonTable = <T extends object>({
             columns={columns}
             dataSource={data}
             loading={loading}
-            pagination={{ pageSize: 10, position: ["bottomCenter"] }}
+            pagination={
+                data?.length > 10
+                    ? { pageSize: 10, position: ["bottomCenter"] }
+                    : false
+            }
+            // pagination={{ pageSize: 10, position: ["bottomCenter"] }}
 
             title={title ? () => <h3>{title}</h3> : undefined}
             locale={{ emptyText: <Empty description="No records found" /> }}

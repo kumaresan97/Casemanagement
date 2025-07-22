@@ -17,6 +17,7 @@ import CustomButton from "../../../Components/Button/CustomButton";
 import CustomTooltip from "../../../Components/Tooltip/CustomTooltip";
 import { ColumnsType } from "antd/es/table";
 import { ICaseDocument } from "../../../Types/Type";
+import Loader from "../../../Components/Spinner/Loader";
 
 
 
@@ -27,54 +28,97 @@ const Documents = () => {
 
     // Use it
     console.log("Selected Case:", selectedCase);
-    const [visible, setVisible] = useState(false);
+    const [visible, setVisible] = useState<boolean>(false);
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [documentsData, setDocumentsData] = useState<ICaseDocument[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+
     let caseFolderName = `Case-${selectedCase.Id}-${selectedCase.CaseName}`.replace(
         /\s+/g,
         ""
     );
-    const loadDocuments = async () => {
-        const data = await getCaseDocuments(caseFolderName);
-        console.log("Documents: ", data);
+    // const loadDocuments = async () => {
+    //     const data = await getCaseDocuments(caseFolderName);
+    //     console.log("Documents: ", data);
 
-        setDocumentsData(data);
+    //     setDocumentsData(data);
+    // };
+
+
+    // const handleUploadClick = () => {
+    //     setVisible(true);
+    // };
+
+    // const handleCancel = () => {
+    //     setVisible(false);
+    //     setFileList([]);
+    // };
+    // const handleSubmit = async () => {
+    //     const uploadList: any = fileList.map(file => ({
+    //         name: file.name,
+    //         originFileObj: file.originFileObj,
+    //     }));
+
+
+    //     await uploadFilesToLibrary(uploadList, `CaseDocuments/${caseFolderName}`); message.success("Files uploaded successfully!");
+    //     await loadDocuments()
+    //     setFileList([]); // Clear files
+    //     setVisible(false);  // Close modal
+    // };
+
+
+
+    // Load documents from SharePoint folder
+    const loadDocuments = async () => {
+        setLoading(true);
+        try {
+            const data = await getCaseDocuments(caseFolderName);
+            setDocumentsData(data);
+        } catch (error) {
+            message.error("Failed to load documents.");
+            console.error("Error loading documents:", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
-
+    // Open Upload Modal
     const handleUploadClick = () => {
         setVisible(true);
     };
 
+    // Cancel Upload Modal
     const handleCancel = () => {
         setVisible(false);
         setFileList([]);
     };
-    const handleSubmit = async () => {
-        const uploadList: any = fileList.map(file => ({
-            name: file.name,
-            originFileObj: file.originFileObj,
-        }));
-        // const caseFolderName = `Case-${selectedCase.Id}-${selectedCase.CaseName}`.replace(
-        //     /\s+/g,
-        //     ""
-        // );
 
-        await uploadFilesToLibrary(uploadList, `CaseDocuments/${caseFolderName}`); message.success("Files uploaded successfully!");
-        await loadDocuments()
-        setFileList([]); // Clear files
-        setVisible(false);  // Close modal
+    // Submit selected files
+    const handleSubmit = async () => {
+        try {
+            setLoading(true);
+            const uploadList: any = fileList.map(file => ({
+                name: file.name,
+                originFileObj: file.originFileObj,
+            }));
+
+            await uploadFilesToLibrary(uploadList, `CaseDocuments/${caseFolderName}`);
+            message.success("Files uploaded successfully!");
+
+            await loadDocuments(); // Reload documents
+            setVisible(false);     // Close modal
+            setFileList([]);       // Clear files
+        } catch (error) {
+            message.error("Failed to upload files.");
+            console.error("Upload error:", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
 
     const documentsColumns: ColumnsType<ICaseDocument> = [
-        // {
-        //     title: <input type="checkbox" />, // header checkbox
-        //     dataIndex: "checkbox",
-        //     key: "checkbox",
-        //     render: () => <input type="checkbox" />,
-        //     width: 50,
-        // },
+
 
         {
             title: "Document name",
@@ -108,16 +152,7 @@ const Documents = () => {
             key: "date",
             width: 250
         },
-        // {
-        //     title: "Status",
-        //     dataIndex: "status",
-        //     key: "status",
-        //     render: (text: string) => (
-        //         <span >
-        //             {text}
-        //         </span>
-        //     ),
-        // },
+
 
         {
             title: "Action",
@@ -144,17 +179,7 @@ const Documents = () => {
             ),
         }
 
-        // {
-        //     title: "Action",
-        //     dataIndex: "action",
-        //     key: "action",
-        //     render: () => (
-        //         <div >
-        //             <EyeOutlined style={{ marginRight: 10, color: "#000" }} />
-        //             <DownloadOutlined style={{ color: "#f0b400" }} />
-        //         </div>
-        //     ),
-        // },
+
     ];
 
     useEffect(() => {
@@ -164,22 +189,29 @@ const Documents = () => {
     }, []);
     return (
         <div>
+            {loading ? <Loader /> :
 
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
-                <p>Documents</p>
-                <CustomButton label="Upload" bgColor="#cfa21e" color="#fff" type="primary" borderRadius={4} onClick={handleUploadClick}
-                    style={{ border: "none" }}
-                />
-
-                {/* <Button type="primary" onClick={handleUploadClick}>Upload</Button> */}
-            </div>
+                <>
 
 
-            <CommonTable<ICaseDocument>
-                columns={documentsColumns}
-                data={documentsData}
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
+                        <p>Documents</p>
+                        <CustomButton label="Upload" bgColor="#cfa21e" color="#fff" type="primary" borderRadius={4} onClick={handleUploadClick}
+                            style={{ border: "none" }}
+                        />
 
-            />
+                        {/* <Button type="primary" onClick={handleUploadClick}>Upload</Button> */}
+                    </div>
+
+
+                    <CommonTable<ICaseDocument>
+                        columns={documentsColumns}
+                        data={documentsData}
+
+                    />
+
+                </>
+            }
 
             <Modal
                 title="Upload Documents"
@@ -195,7 +227,7 @@ const Documents = () => {
                         />
                         <CustomButton label="submit" type="primary"
                             // loading={loading}
-                            onClick={handleSubmit}
+                            onClick={() => { handleSubmit() }}
                             bgColor="#cfa21e"
                             borderRadius={4}
                             color="#fff"

@@ -11,12 +11,12 @@ import { addTreatmentPlan, getDiagnosticCode, loadDataByCaseId, updateTreatmentP
 import { DiagnosticCode, ITreatmentPlan } from "../../../Types/Type";
 import { useState } from "react";
 import CustomButton from "../../../Components/Button/CustomButton";
-import CustomLoader from "../../../Components/Loader/Loader";
+import Loader from "../../../Components/Spinner/Loader";
 const TreatmentPlans = () => {
 
     const [diagnoses, setDiagnoses] = useState<DiagnosticCode[]>([])
     const [existingItemId, setExistingItemId] = useState<number | null>(null);
-    const [isloading, setisLoading] = useState<boolean>(false)
+    const [isLoading, setIsLoading] = useState<boolean>(false); // renamed to camelCase
 
     const [formData, setFormData] = useState<ITreatmentPlan>({
         ID: null,
@@ -30,51 +30,99 @@ const TreatmentPlans = () => {
     });
 
     const { id } = useParams()
+    // const init = async () => {
+    //     setisLoading(true)
+    //     const TPlans = await loadDataByCaseId(Number(id))
+    //     const Diagonstic = await getDiagnosticCode(Number(id))
+    //     Diagonstic && setDiagnoses(Diagonstic)
+    //     TPlans && setFormData(TPlans)
+    //     if (TPlans) {
+    //         setExistingItemId(TPlans.ID || null);
+
+    //     }
+    //     else {
+    //         setExistingItemId(null);
+
+    //     }
+    //     setisLoading(false)
+
+    // }
+
+    // const handleChange = (field: keyof ITreatmentPlan, value: any) => {
+    //     setFormData(prev => ({
+    //         ...prev,
+    //         [field]: value,
+    //     }));
+    // };
+
+    // const handleSubmit = async () => {
+    //     //   const { isValid, errors } = validateTreatmentPlan(formData);
+    //     //   if (!isValid) {
+    //     //     console.warn(errors);
+    //     //     return;
+    //     //   }
+    //     setisLoading(true)
+
+    //     if (existingItemId) {
+    //         await updateTreatmentPlan(existingItemId, formData, setisLoading);
+    //         await init()
+
+
+    //     } else {
+    //         await addTreatmentPlan(formData, Number(id), setisLoading);
+    //         await init()
+
+    //     }
+    // };
+
+
+
     const init = async () => {
-        setisLoading(true)
-        const TPlans = await loadDataByCaseId(Number(id))
-        const Diagonstic = await getDiagnosticCode(Number(id))
-        Diagonstic && setDiagnoses(Diagonstic)
-        TPlans && setFormData(TPlans)
-        if (TPlans) {
-            setExistingItemId(TPlans.ID || null);
-
+        try {
+            setIsLoading(true);
+            const TPlans = await loadDataByCaseId(Number(id));
+            const Diagonstic = await getDiagnosticCode(Number(id));
+            if (Diagonstic) setDiagnoses(Diagonstic);
+            if (TPlans) {
+                setFormData(TPlans);
+                setExistingItemId(TPlans.ID || null);
+            } else {
+                setExistingItemId(null);
+            }
+        } catch (error) {
+            console.error("Error loading data:", error);
+        } finally {
+            setIsLoading(false);
         }
-        else {
-            setExistingItemId(null);
-
-        }
-        setisLoading(false)
-
-    }
+    };
 
     const handleChange = (field: keyof ITreatmentPlan, value: any) => {
-        setFormData(prev => ({
+        setFormData((prev) => ({
             ...prev,
             [field]: value,
         }));
     };
 
     const handleSubmit = async () => {
-        //   const { isValid, errors } = validateTreatmentPlan(formData);
-        //   if (!isValid) {
-        //     console.warn(errors);
-        //     return;
-        //   }
-        setisLoading(true)
+        // const { isValid, errors } = validateTreatmentPlan(formData);
+        // if (!isValid) return;
 
-        if (existingItemId) {
-            await updateTreatmentPlan(existingItemId, formData, setisLoading);
-            await init()
+        try {
+            setIsLoading(true);
 
+            if (existingItemId) {
+                await updateTreatmentPlan(existingItemId, formData); // Remove setIsLoading from inside
+            } else {
+                await addTreatmentPlan(formData, Number(id));
+            }
 
-        } else {
-            await addTreatmentPlan(formData, Number(id), setisLoading);
-            await init()
-
+            await init(); // Refresh after submit
+        } catch (error) {
+            console.error("Submission error:", error);
+        } finally {
+            setIsLoading(false);
         }
     };
-
 
     React.useEffect(() => {
         init()
@@ -82,7 +130,7 @@ const TreatmentPlans = () => {
     return (
 
         <>
-            {isloading ? <CustomLoader></CustomLoader> :
+            {isLoading ? <Loader></Loader> :
 
                 <div className={styles.treatmentPlansWrapper}>
                     {/* Diagnostics Section */}
@@ -190,7 +238,7 @@ const TreatmentPlans = () => {
                         </div>
                     </div>
                     <div className={styles.footer}>
-                        <CustomButton label="Submit" type="primary" onClick={handleSubmit} />
+                        <CustomButton label="Submit" type="primary" onClick={handleSubmit} bgColor="#b78e1a" color="#fff" />
 
                     </div>
 
@@ -202,6 +250,8 @@ const TreatmentPlans = () => {
 
 
                 </div>
+
+
             }
         </>
     )

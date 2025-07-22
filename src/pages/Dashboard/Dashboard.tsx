@@ -13,7 +13,10 @@ const Resolved: any = require("../../assets/png/Resolved.png")
 const Dashboard: React.FC = () => {
     return (
 
-        <>
+        <div style={{
+            padding: "1rem",
+            width: "100%"
+        }}>
             <h3>Dashboard</h3>
 
             <p style={{
@@ -31,7 +34,7 @@ const Dashboard: React.FC = () => {
                     icon={<img src={Resolved} alt="clients" />}
                 />
             </div>
-        </>
+        </div>
     );
 }
 export default Dashboard

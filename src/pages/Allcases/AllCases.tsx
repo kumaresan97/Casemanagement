@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import * as React from "react";
-import { Avatar } from "antd";
+import { Avatar, message } from "antd";
 import CommonTable from "../../Components/Table/CustomTable";
 import PageHeader from "../../Components/pageHeader/Pageheader";
 import { PlusCircleOutlined } from '@ant-design/icons';
@@ -16,6 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import type { ColumnsType } from "antd/es/table";
 import CustomTooltip from "../../Components/Tooltip/CustomTooltip";
 import EllipsisTag from "../../Components/Tag/Customtag";
+import Loader from "../../Components/Spinner/Loader";
 
 
 
@@ -195,6 +198,7 @@ const AllCases = () => {
                 setMasterData(res)
             } catch (error) {
                 console.error("Failed to fetch cases:", error);
+                message.error("Error loading case data.");
             } finally {
                 setLoading(false);
             }
@@ -203,12 +207,14 @@ const AllCases = () => {
         void fetchData();
     }, []);
 
-    return (
+    return loading ? <Loader /> : (
 
         <div style={{
             background: "#ffff",
             padding: "16px"
         }}>
+
+
 
             <PageHeader
                 title="All Cases"
@@ -230,7 +236,7 @@ const AllCases = () => {
             <CommonTable<cases>
                 columns={columns}
                 data={allCase}
-                loading={loading}
+                // loading={loading}
                 onRowClick={(record) => console.log("Row clicked:", record)}
 
             />

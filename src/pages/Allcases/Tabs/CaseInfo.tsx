@@ -4,11 +4,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import * as React from "react"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "../Case.module.scss"
 import InputField from "../../../Components/Formfields/Textfield/CustomTextfield";
 import SelectField from "../../../Components/Formfields/Dropdown/CustomDropdown";
-import { Avatar, Button, Tag, } from "antd";
+import { Avatar, Button, message, Tag, } from "antd";
 import PeoplePickerField from "../../../Components/Formfields/PeoplePicker/CustomPeoplePicker";
 // import { useSelector } from "react-redux";
 import TextAreaField from "../../../Components/Formfields/TextArea/CustomTextArea";
@@ -25,6 +25,7 @@ import { Cases, constants } from "../../../config/constants";
 import { validateStep } from "../../../utils/ValidateStep";
 import CustomButton from "../../../Components/Button/CustomButton";
 import { getServicetype } from "../../../Service/getServicetype";
+import Loader from "../../../Components/Spinner/Loader";
 
 
 const CaseInfo = () => {
@@ -36,30 +37,107 @@ const CaseInfo = () => {
     const [formErrors, setFormErrors] = useState<Partial<Record<keyof cases, string>>>({});
     const selectedCase = useSelector((state: any) => state.data.selectedCase);
     const [serviceType, setServiceType] = useState<SelectOption[]>([])
+    const [loading, setLoading] = useState(false); // Loader state
+
 
     const dispatch = useDispatch();
 
+    // const fetchAndStoreCase = async (id: number) => {
+    //     const serviceType = await getServicetype(constants.Listnames.ServiceType)
+
+    //     const result = await getAllCases(id);
+    //     // setFormData(result[0])
+    //     console.log("result: ", result);
+    //     setServiceType(serviceType)
+    //     if (result?.length > 0) {
+    //         setFormData(result[0])
+
+    //         dispatch?.(setSelectedCase(result[0]));
+    //     }
+    // };
+    // const handleChange = <K extends keyof cases>(
+
+    //     key: K,
+    //     value: cases[K]
+    // ) => {
+    //     // const handleChange = (key: string, value: any) => {
+    //     setFormData((prev: any) => ({ ...prev, [key]: value }));
+    //     debugger;
+    //     setFormErrors((prevErrors) => {
+    //         const updated = { ...prevErrors };
+    //         delete updated[key];
+    //         return updated;
+    //     });
+    // };
+
+
+    // const steps = [
+    //     {
+    //         title: 'Client Details',
+    //         component: "",
+    //         requiredFields: ['CaseName', 'ServiceType', 'CaseManager', 'Description', 'Date'],
+    //     },]
+
+    // const handleSave = async () => {
+    //     const { valid, fieldErrors } = validateStep(0, steps, formData);
+    //     console.log("fieldErrors: ", fieldErrors);
+
+
+    //     if (!valid) {
+    //         setFormErrors(fieldErrors);
+    //         return;
+    //     }
+
+
+    //     await UpdatecaseInfo(Number(id), formData)
+    //     dispatch?.(setSelectedCase(formData));
+
+    //     console.log('Saving...', formData);
+    //     // Call API here
+    //     setIsEditMode(false);
+    // };
+
+    // const handleCancel = () => {
+    //     setFormData(selectedCase)
+    //     // setFormData(caseData); // Reset form
+    //     setIsEditMode(false);
+    // };
+
+
+    // React.useEffect(() => {
+    //     fetchAndStoreCase(Number(id))
+
+    // }, [id])
+
+
+
+    // Fetch case and service type details
     const fetchAndStoreCase = async (id: number) => {
-        const serviceType = await getServicetype(constants.Listnames.ServiceType)
+        try {
+            setLoading(true);
+            const [serviceType, result] = await Promise.all([
+                getServicetype(constants.Listnames.ServiceType),
+                getAllCases(id)
+            ]);
 
-        const result = await getAllCases(id);
-        // setFormData(result[0])
-        console.log("result: ", result);
-        setServiceType(serviceType)
-        if (result?.length > 0) {
-            setFormData(result[0])
+            setServiceType(serviceType);
 
-            dispatch?.(setSelectedCase(result[0]));
+            if (result?.length > 0) {
+                setFormData(result[0]);
+                dispatch?.(setSelectedCase(result[0]));
+            }
+        } catch (error) {
+            console.error("Error fetching case:", error);
+        } finally {
+            setLoading(false);
         }
     };
-    const handleChange = <K extends keyof cases>(
 
-        key: K,
-        value: cases[K]
-    ) => {
-        // const handleChange = (key: string, value: any) => {
-        setFormData((prev: any) => ({ ...prev, [key]: value }));
-        debugger;
+    // Handle form value changes
+    const handleChange = <K extends keyof cases>(key: K, value: cases[K]) => {
+        setFormData((prev) => ({ ...prev, [key]: value }));
+
+        // Clear field error on change
         setFormErrors((prevErrors) => {
             const updated = { ...prevErrors };
             delete updated[key];
@@ -67,210 +145,220 @@ const CaseInfo = () => {
         });
     };
 
-
+    // Define validation steps
     const steps = [
         {
-            title: 'Client Details',
-            component: "",
-            requiredFields: ['CaseName', 'ServiceType', 'CaseManager', 'Description', 'Date'],
-        },]
+            title: "Client Details",
+            component: "", // You can dynamically insert a component later
+            requiredFields: ["CaseName", "ServiceType", "CaseManager", "Description", "Date"],
+        },
+    ];
 
+    // Save updated form data
     const handleSave = async () => {
         const { valid, fieldErrors } = validateStep(0, steps, formData);
-        console.log("fieldErrors: ", fieldErrors);
-
-
         if (!valid) {
             setFormErrors(fieldErrors);
             return;
         }
 
+        try {
+            setLoading(true);
+            await UpdatecaseInfo(Number(id), formData);
+            dispatch?.(setSelectedCase(formData));
+            message.success("Case updated successfully"); // ✅ Show success message
 
-        await UpdatecaseInfo(Number(id), formData)
-        dispatch?.(setSelectedCase(formData));
+            setIsEditMode(false);
+        } catch (err) {
+            message.error("Failed to update case"); // ✅ Optional: Show error if update fails
 
-        console.log('Saving...', formData);
-        // Call API here
-        setIsEditMode(false);
+            console.error("Update failed:", err);
+            setLoading(false);
+
+
+        } finally {
+            setLoading(false);
+        }
     };
 
+    // Reset to original case data
     const handleCancel = () => {
-        setFormData(selectedCase)
-        // setFormData(caseData); // Reset form
+        setFormData(selectedCase);
         setIsEditMode(false);
     };
 
-
-    React.useEffect(() => {
-        fetchAndStoreCase(Number(id))
-
-    }, [id])
+    // Initial data load
+    useEffect(() => {
+        if (id) fetchAndStoreCase(Number(id));
+    }, [id]);
 
 
 
 
     return (
+        <>
+            {loading ? <Loader /> :
+                <div className={styles.container}>
 
-
-        <div className={styles.container}>
-
-            <div className={styles.header}>
-                {!isEditMode && (
-                    <Button onClick={() => setIsEditMode(true)}>Edit</Button>
-                )}
-            </div>
-            <div className={styles.wrapper}>
-                <div className={styles.leftSection} style={{ gap: isEditMode ? 0 : 15 }}>
-                    <div className={styles.row}>
-                        <div className={styles.left}>Case Name</div>
-                        <div className={styles.right}>
-                            {isEditMode ? (
-                                <InputField value={formData?.CaseName}
-                                    disableWrapper
-                                    onChange={(val) => handleChange("CaseName", val)}
-                                    error={formErrors.CaseName}
-
-                                />
-                            ) : <span>{formData?.CaseName}</span>}
-                        </div>
+                    <div className={styles.header}>
+                        {!isEditMode && (
+                            <Button onClick={() => setIsEditMode(true)}>Edit</Button>
+                        )}
                     </div>
-                    <div className={styles.row}>
-                        <div className={styles.left}>Date</div>
-                        <div className={styles.right}>
-                            {isEditMode ? (
-                                <DatePickerField
-                                    label=""
-                                    value={moment(formData?.Date).format("MM/DD/YYYY")}
-                                    disableWrapper
-                                    onChange={(val) => handleChange("Date", val)}
-                                    error={formErrors.Date}
+                    <div className={styles.wrapper}>
+                        <div className={styles.leftSection} style={{ gap: isEditMode ? 0 : 15 }}>
+                            <div className={styles.row}>
+                                <div className={styles.left}>Case Name</div>
+                                <div className={styles.right}>
+                                    {isEditMode ? (
+                                        <InputField value={formData?.CaseName}
+                                            disableWrapper
+                                            onChange={(val) => handleChange("CaseName", val)}
+                                            error={formErrors.CaseName}
 
-                                />
-                            ) : (
-                                <span>{formData?.Date || "—"}</span>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className={styles.row}>
-                        <div className={styles.left}>BillableType</div>
-                        <div className={styles.right}>
-                            {isEditMode ? (
-                                <SelectField
-                                    disableWrapper
-                                    value={formData?.BillableType}
-                                    options={[
-                                        { label: "Billable", value: "Billable" },
-                                        { label: "Non-billable", value: "Non-billable" }
-                                    ]}
-                                    onChange={(val) => handleChange("BillableType", val)}
-                                    error={formErrors.BillableType}
-
-                                />
-                            ) : (
-                                <span>{formData?.BillableType?.value || null}</span>
-                            )}
-                        </div>
-                    </div>
-                </div>
-
-                <div className={styles.rightSection} style={{ gap: isEditMode ? 0 : 15 }}>
-                    <div className={styles.row}>
-                        <div className={styles.left}>ServiceType</div>
-                        <div className={styles.right}>
-                            {isEditMode ? (
-                                <SelectField
-                                    disableWrapper
-                                    multiple
-                                    value={formData?.ServiceType}
-                                    onChange={(val) => handleChange("ServiceType", val)}
-                                    options={serviceType}
-                                    // options={[
-                                    //     { label: "H2025", value: "H2025" },
-                                    //     { label: "H0043", value: "H0043" },
-                                    // ]}
-                                    error={formErrors.ServiceType}
-
-                                />
-                            ) : Array.isArray(formData?.ServiceType) &&
-                                formData.ServiceType.length > 0 ? (
-                                <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-                                    {formData.ServiceType.map((s, idx) => (
-                                        <Tag
-                                            key={idx}
-                                            color="gold"
-                                            style={{
-                                                maxWidth: 100, // or your desired width (e.g. 120)
-                                                overflow: 'hidden',
-                                                whiteSpace: 'nowrap',
-                                                textOverflow: 'ellipsis',
-                                                display: 'inline-block',
-                                            }}
-                                            title={s.label} // shows full text on hover
-                                        >
-                                            {s.label}
-                                        </Tag>
-                                    ))}
+                                        />
+                                    ) : <span>{formData?.CaseName}</span>}
                                 </div>
-                            ) : (
-                                <span>—</span>
-                            )}
-                        </div>
-                    </div>
-                    <div className={styles.row}>
-                        <div className={styles.left}>CaseManager</div>
-                        <div className={styles.right}>
-                            {isEditMode ? (
-                                <PeoplePickerField
+                            </div>
+                            <div className={styles.row}>
+                                <div className={styles.left}>Date</div>
+                                <div className={styles.right}>
+                                    {isEditMode ? (
+                                        <DatePickerField
+                                            label=""
+                                            value={moment(formData?.Date).format("MM/DD/YYYY")}
+                                            disableWrapper
+                                            onChange={(val) => handleChange("Date", val)}
+                                            error={formErrors.Date}
 
-                                    defaultUsers={formData.CaseManager?.email ? [formData.CaseManager.email] : []}
-                                    context={Context}
-                                    onChange={(val: any) => handleChange("CaseManager", val[0])}
-                                    error={formErrors.CaseManager}
-
-                                />
-                            ) : (
-                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                    <Avatar
-                                        size="small"
-                                        src={`/_layouts/15/userphoto.aspx?size=S&username=${formData?.CaseManager?.email ?? ""}`}
-                                    />
-                                    <span>{formData?.CaseManager?.name || "—"}</span>
+                                        />
+                                    ) : (
+                                        <span>{formData?.Date || "—"}</span>
+                                    )}
                                 </div>
-                            )}
+                            </div>
+
+                            <div className={styles.row}>
+                                <div className={styles.left}>BillableType</div>
+                                <div className={styles.right}>
+                                    {isEditMode ? (
+                                        <SelectField
+                                            disableWrapper
+                                            value={formData?.BillableType}
+                                            options={[
+                                                { label: "Billable", value: "Billable" },
+                                                { label: "Non-billable", value: "Non-billable" }
+                                            ]}
+                                            onChange={(val) => handleChange("BillableType", val)}
+                                            error={formErrors.BillableType}
+
+                                        />
+                                    ) : (
+                                        <span>{formData?.BillableType?.value || null}</span>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className={styles.rightSection} style={{ gap: isEditMode ? 0 : 15 }}>
+                            <div className={styles.row}>
+                                <div className={styles.left}>ServiceType</div>
+                                <div className={styles.right}>
+                                    {isEditMode ? (
+                                        <SelectField
+                                            disableWrapper
+                                            multiple
+                                            value={formData?.ServiceType}
+                                            onChange={(val) => handleChange("ServiceType", val)}
+                                            options={serviceType}
+                                            // options={[
+                                            //     { label: "H2025", value: "H2025" },
+                                            //     { label: "H0043", value: "H0043" },
+                                            // ]}
+                                            error={formErrors.ServiceType}
+
+                                        />
+                                    ) : Array.isArray(formData?.ServiceType) &&
+                                        formData.ServiceType.length > 0 ? (
+                                        <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+                                            {formData.ServiceType.map((s, idx) => (
+                                                <Tag
+                                                    key={idx}
+                                                    color="gold"
+                                                    style={{
+                                                        maxWidth: 100, // or your desired width (e.g. 120)
+                                                        overflow: 'hidden',
+                                                        whiteSpace: 'nowrap',
+                                                        textOverflow: 'ellipsis',
+                                                        display: 'inline-block',
+                                                    }}
+                                                    title={s.label} // shows full text on hover
+                                                >
+                                                    {s.label}
+                                                </Tag>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <span>—</span>
+                                    )}
+                                </div>
+                            </div>
+                            <div className={styles.row}>
+                                <div className={styles.left}>CaseManager</div>
+                                <div className={styles.right}>
+                                    {isEditMode ? (
+                                        <PeoplePickerField
+
+                                            defaultUsers={formData.CaseManager?.email ? [formData.CaseManager.email] : []}
+                                            context={Context}
+                                            onChange={(val: any) => handleChange("CaseManager", val[0])}
+                                            error={formErrors.CaseManager}
+
+                                        />
+                                    ) : (
+                                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                            <Avatar
+                                                size="small"
+                                                src={`/_layouts/15/userphoto.aspx?size=S&username=${formData?.CaseManager?.email ?? ""}`}
+                                            />
+                                            <span>{formData?.CaseManager?.name || "—"}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className={styles.row}>
+                                <div className={styles.left}>Description</div>
+                                <div className={styles.right}>
+                                    {isEditMode ? (
+                                        <TextAreaField
+                                            rows={4}
+                                            disableWrapper
+                                            value={formData?.Description}
+                                            onChange={(val) => handleChange("Description", val)}
+                                            error={formErrors.Description}
+
+                                        />
+                                    ) : (
+                                        <span>{formData?.Description || "—"}</span>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div className={styles.row}>
-                        <div className={styles.left}>Description</div>
-                        <div className={styles.right}>
-                            {isEditMode ? (
-                                <TextAreaField
-                                    rows={4}
-                                    disableWrapper
-                                    value={formData?.Description}
-                                    onChange={(val) => handleChange("Description", val)}
-                                    error={formErrors.Description}
 
-                                />
-                            ) : (
-                                <span>{formData?.Description || "—"}</span>
-                            )}
+                    {isEditMode && (
+                        <div className={styles.footer}>
+                            <CustomButton type="primary" label="Save" onClick={handleSave} bgColor="#b78e1a" />
+
+                            <CustomButton label="Cancel" onClick={handleCancel} />
+
+                            {/* <Button onClick={handleCancel}>Cancel</Button> */}
                         </div>
-                    </div>
+                    )}
+
                 </div>
-            </div>
-
-            {isEditMode && (
-                <div className={styles.footer}>
-                    <CustomButton type="primary" label="Save" onClick={handleSave} bgColor="#b78e1a" />
-
-                    <CustomButton label="Cancel" onClick={handleCancel} />
-
-                    {/* <Button onClick={handleCancel}>Cancel</Button> */}
-                </div>
-            )}
-
-        </div>
+            }
+        </>
 
 
 

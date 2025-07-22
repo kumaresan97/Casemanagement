@@ -5,6 +5,8 @@ export interface ListName {
   ServiceType: string;
   CaseNotes: string;
   Diagnostics: string;
+  EligibilityConfig: string;
+  Eligibility: string;
 }
 
 export interface SelectOption {

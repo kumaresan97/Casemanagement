@@ -7,7 +7,6 @@
 
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { sp } from "@pnp/sp/presets/all";
 import { useParams } from "react-router-dom";
 import SelectField from "../../../Components/Formfields/Dropdown/CustomDropdown";
 import CheckpointGroup from "../../../Components/Formfields/Checkbox/CustomCheckbox";
@@ -15,6 +14,9 @@ import TextAreaField from "../../../Components/Formfields/TextArea/CustomTextAre
 // import CustomButton from "../../../Components/Button/CustomButton";
 import styles from "../Case.module.scss"
 import CustomFooterBtn from "../../../Components/FooterBtn/CustomFooterBtn";
+import { createEligibilityEntry, fetchEligibilityCheckpoints, fetchEligibilityConfigs, fetchExistingEligibility, recycleEligibilityEntry, updateEligibilityEntry } from "../../../Service/AllCases/AllCaseService";
+import { message } from "antd";
+import Loader from "../../../Components/Spinner/Loader";
 
 
 // const Eligibility = () => {
@@ -271,14 +273,14 @@ interface IConfig {
     MarkAsMain?: string | boolean;
 }
 
-interface IEligibilityItem {
-    Id: number;
-    Eligibility: { ID: number };
-    EligibilityCheckPoints: { ID: number }[];
-    Status: string;
-    Comments: string;
-    Case: { Id: number };
-}
+// interface IEligibilityItem {
+//     Id: number;
+//     Eligibility: { ID: number };
+//     EligibilityCheckPoints: { ID: number }[];
+//     Status: string;
+//     Comments: string;
+//     Case: { Id: number };
+// }
 
 interface IFormData {
     eligibility?: { label: string; value: string };
@@ -288,6 +290,150 @@ interface IFormData {
 }
 
 const Eligibility = () => {
+    // const { id } = useParams();
+    // const [configList, setConfigList] = useState<IConfig[]>([]);
+    // const [checkpointOptions, setCheckpointOptions] = useState<IConfig[]>([]);
+    // const [descriptionHtml, setDescriptionHtml] = useState("");
+    // const [formData, setFormData] = useState<IFormData>({
+    //     eligibility: undefined,
+    //     checkpoints: [],
+    //     status: undefined,
+    //     comments: "",
+    // });
+    // const [existingIds, setExistingIds] = useState<{
+    //     entryId: number | null;
+    //     eligibilityId: number | null;
+    // }>({ entryId: null, eligibilityId: null });
+
+    // const handleChange = <K extends keyof IFormData>(key: K, value: IFormData[K]) => {
+    //     setFormData((prev) => ({ ...prev, [key]: value }));
+    // };
+
+    // const loadCheckpoints = async (eligibility: string) => {
+    //     const related = await sp.web.lists
+    //         .getByTitle("EligibilityConfig")
+    //         .items.select("Id", "Eligibility", "CriteriaPoints", "Description")
+    //         .filter(`Eligibility eq '${eligibility.trim()}'`)
+    //         .get();
+
+    //     setCheckpointOptions(related);
+    //     setDescriptionHtml(related[0]?.Description || "");
+    // };
+
+    // const handleEligibilityChange = async (val: any) => {
+    //     handleChange("eligibility", val);
+    //     handleChange("checkpoints", []);
+    //     await loadCheckpoints(val.value);
+    // };
+
+
+
+    // const loadConfigs = async () => {
+    //     const configs = await sp.web.lists
+    //         .getByTitle("EligibilityConfig")
+    //         .items.select("Id", "Eligibility", "CriteriaPoints", "Description", "MarkAsMain")
+    //         .get();
+
+    //     setConfigList(configs);
+
+    //     const defaultConfig =
+    //         configs.find(c => c.Eligibility === "Supportive Housing") ||
+    //         configs.find(c => c.MarkAsMain === "Yes") ||
+    //         configs[0];
+
+    //     if (defaultConfig) {
+    //         const eligibility = { label: defaultConfig.Eligibility, value: defaultConfig.Eligibility };
+    //         handleChange("eligibility", eligibility);
+    //         setDescriptionHtml(defaultConfig.Description || "");
+    //         await loadCheckpoints(defaultConfig.Eligibility);
+    //     }
+    // };
+
+    // const loadExistingEligibility = async () => {
+    //     if (!id || configList.length === 0) return;
+
+    //     const results: IEligibilityItem[] = await sp.web.lists
+    //         .getByTitle("Eligibility")
+    //         .items.select("Id", "Status", "Comments", "EligibilityCheckPoints/ID", "Eligibility/ID", "Case/Id")
+    //         .expand("Eligibility", "EligibilityCheckPoints", "Case")
+    //         .filter(`CaseId eq ${Number(id)}`)
+    //         .top(1)
+    //         .get();
+
+    //     if (results.length > 0) {
+    //         const item = results[0];
+    //         const eligibilityId = item.Eligibility?.ID;
+    //         const configItem = configList.find(cfg => cfg.Id === eligibilityId);
+
+    //         if (configItem) {
+    //             const eligibility = { label: configItem.Eligibility, value: configItem.Eligibility };
+
+    //             setFormData({
+    //                 eligibility,
+    //                 status: { label: item.Status, value: item.Status },
+    //                 comments: item.Comments || "",
+    //                 checkpoints: item.EligibilityCheckPoints?.map(cp => cp.ID) || [],
+    //             });
+
+    //             setExistingIds({
+    //                 entryId: item.Id,
+    //                 eligibilityId: item.Eligibility?.ID || null,
+    //             });
+
+    //             await loadCheckpoints(configItem.Eligibility);
+    //         }
+    //     }
+    // };
+
+    // const handleSave = async () => {
+    //     const selected = configList.find(c => c.Eligibility === formData.eligibility?.value);
+    //     if (!selected) return alert("Eligibility configuration not found.");
+
+    //     const isChanged = selected.Id !== existingIds.eligibilityId;
+    //     const { entryId } = existingIds;
+
+    //     const payload = {
+    //         Title: "Eligibility Entry",
+    //         CaseId: Number(id),
+    //         EligibilityId: selected.Id,
+    //         EligibilityCheckPointsId: formData.checkpoints.length
+    //             ? { results: formData.checkpoints }
+    //             : null,
+    //         Status: formData.status?.value || "",
+    //         Comments: formData.comments || "",
+    //     };
+
+    //     if (entryId && isChanged) {
+    //         await sp.web.lists.getByTitle("Eligibility").items.getById(entryId).recycle();
+    //     }
+
+    //     if (!entryId || isChanged) {
+    //         await sp.web.lists.getByTitle("Eligibility").items.add(payload);
+    //         await loadConfigs();
+
+    //         alert("Eligibility saved successfully!");
+    //     } else {
+    //         await sp.web.lists.getByTitle("Eligibility").items.getById(entryId).update({
+    //             EligibilityCheckPointsId: payload.EligibilityCheckPointsId,
+    //             Status: payload.Status,
+    //             Comments: payload.Comments,
+    //         });
+    //         await loadConfigs();
+
+    //         alert("Eligibility updated successfully!");
+    //     }
+    // };
+
+    // useEffect(() => {
+    //     loadConfigs();
+    // }, []);
+
+    // useEffect(() => {
+    //     loadExistingEligibility();
+    // }, [configList]);
+
+
+
     const { id } = useParams();
     const [configList, setConfigList] = useState<IConfig[]>([]);
     const [checkpointOptions, setCheckpointOptions] = useState<IConfig[]>([]);
@@ -298,94 +444,88 @@ const Eligibility = () => {
         status: undefined,
         comments: "",
     });
-    const [existingIds, setExistingIds] = useState<{
-        entryId: number | null;
-        eligibilityId: number | null;
-    }>({ entryId: null, eligibilityId: null });
+    const [isLoading, setIsLoading] = useState(false);
+
+    const [existingIds, setExistingIds] = useState({
+        entryId: null as number | null,
+        eligibilityId: null as number | null,
+    });
 
     const handleChange = <K extends keyof IFormData>(key: K, value: IFormData[K]) => {
-        setFormData((prev) => ({ ...prev, [key]: value }));
-    };
-
-    const loadCheckpoints = async (eligibility: string) => {
-        const related = await sp.web.lists
-            .getByTitle("EligibilityConfig")
-            .items.select("Id", "Eligibility", "CriteriaPoints", "Description")
-            .filter(`Eligibility eq '${eligibility.trim()}'`)
-            .get();
-
-        setCheckpointOptions(related);
-        setDescriptionHtml(related[0]?.Description || "");
+        setFormData(prev => ({ ...prev, [key]: value }));
     };
 
     const handleEligibilityChange = async (val: any) => {
         handleChange("eligibility", val);
         handleChange("checkpoints", []);
-        await loadCheckpoints(val.value);
+        const checkpoints = await fetchEligibilityCheckpoints(val.value);
+        setCheckpointOptions(checkpoints);
+        setDescriptionHtml(checkpoints[0]?.Description || "");
     };
 
-
-
     const loadConfigs = async () => {
-        const configs = await sp.web.lists
-            .getByTitle("EligibilityConfig")
-            .items.select("Id", "Eligibility", "CriteriaPoints", "Description", "MarkAsMain")
-            .get();
+        setIsLoading(true);
+        try {
+            const configs = await fetchEligibilityConfigs();
+            setConfigList(configs);
 
-        setConfigList(configs);
+            const defaultConfig =
+                configs.find(c => c.Eligibility === "Supportive Housing") ||
+                configs.find(c => c.MarkAsMain === true) ||
+                configs[0];
 
-        const defaultConfig =
-            configs.find(c => c.Eligibility === "Supportive Housing") ||
-            configs.find(c => c.MarkAsMain === "Yes") ||
-            configs[0];
+            if (defaultConfig) {
+                const eligibility = { label: defaultConfig.Eligibility, value: defaultConfig.Eligibility };
+                handleChange("eligibility", eligibility);
+                setDescriptionHtml(defaultConfig.Description || "");
+                const checkpoints = await fetchEligibilityCheckpoints(defaultConfig.Eligibility);
+                setCheckpointOptions(checkpoints);
+            }
+        } catch (err) {
+            console.log(err, "failed to eligiblity config");
 
-        if (defaultConfig) {
-            const eligibility = { label: defaultConfig.Eligibility, value: defaultConfig.Eligibility };
-            handleChange("eligibility", eligibility);
-            setDescriptionHtml(defaultConfig.Description || "");
-            await loadCheckpoints(defaultConfig.Eligibility);
+            message.error("Failed to load eligibility configs");
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const loadExistingEligibility = async () => {
+    const loadExisting = async () => {
         if (!id || configList.length === 0) return;
+        setIsLoading(true);
 
-        const results: IEligibilityItem[] = await sp.web.lists
-            .getByTitle("Eligibility")
-            .items.select("Id", "Status", "Comments", "EligibilityCheckPoints/ID", "Eligibility/ID", "Case/Id")
-            .expand("Eligibility", "EligibilityCheckPoints", "Case")
-            .filter(`CaseId eq ${Number(id)}`)
-            .top(1)
-            .get();
+        try {
+            const result = await fetchExistingEligibility(Number(id));
+            if (!result) return;
 
-        if (results.length > 0) {
-            const item = results[0];
-            const eligibilityId = item.Eligibility?.ID;
-            const configItem = configList.find(cfg => cfg.Id === eligibilityId);
+            const configItem = configList.find(cfg => cfg.Id === result.Eligibility?.ID);
+            if (!configItem) return;
 
-            if (configItem) {
-                const eligibility = { label: configItem.Eligibility, value: configItem.Eligibility };
+            const eligibility = { label: configItem.Eligibility, value: configItem.Eligibility };
+            handleChange("eligibility", eligibility);
+            handleChange("status", { label: result.Status, value: result.Status });
+            handleChange("comments", result.Comments || "");
+            handleChange("checkpoints", result.EligibilityCheckPoints?.map((cp: any) => cp.ID) || []);
 
-                setFormData({
-                    eligibility,
-                    status: { label: item.Status, value: item.Status },
-                    comments: item.Comments || "",
-                    checkpoints: item.EligibilityCheckPoints?.map(cp => cp.ID) || [],
-                });
+            setExistingIds({
+                entryId: result.Id,
+                eligibilityId: configItem.Id,
+            });
 
-                setExistingIds({
-                    entryId: item.Id,
-                    eligibilityId: item.Eligibility?.ID || null,
-                });
-
-                await loadCheckpoints(configItem.Eligibility);
-            }
+            const checkpoints = await fetchEligibilityCheckpoints(configItem.Eligibility);
+            setCheckpointOptions(checkpoints);
+            setDescriptionHtml(configItem.Description || "");
+        } catch (err) {
+            console.log("Failed to load existing eligibility: ", err);
+            message.error("Failed to load existing eligibility");
+        } finally {
+            setIsLoading(false);
         }
     };
 
     const handleSave = async () => {
         const selected = configList.find(c => c.Eligibility === formData.eligibility?.value);
-        if (!selected) return alert("Eligibility configuration not found.");
+        if (!selected) return message.warning("Eligibility configuration not found");
 
         const isChanged = selected.Id !== existingIds.eligibilityId;
         const { entryId } = existingIds;
@@ -401,24 +541,26 @@ const Eligibility = () => {
             Comments: formData.comments || "",
         };
 
-        if (entryId && isChanged) {
-            await sp.web.lists.getByTitle("Eligibility").items.getById(entryId).recycle();
-        }
+        setIsLoading(true);
+        try {
+            if (entryId && isChanged) {
+                await recycleEligibilityEntry(entryId);
+                await createEligibilityEntry(payload);
+                message.success("Eligibility changed and saved successfully");
+            } else if (!entryId) {
+                await createEligibilityEntry(payload);
+                message.success("Eligibility saved successfully");
+            } else {
+                await updateEligibilityEntry(entryId, payload);
+                message.success("Eligibility updated successfully");
+            }
 
-        if (!entryId || isChanged) {
-            await sp.web.lists.getByTitle("Eligibility").items.add(payload);
             await loadConfigs();
-
-            alert("Eligibility saved successfully!");
-        } else {
-            await sp.web.lists.getByTitle("Eligibility").items.getById(entryId).update({
-                EligibilityCheckPointsId: payload.EligibilityCheckPointsId,
-                Status: payload.Status,
-                Comments: payload.Comments,
-            });
-            await loadConfigs();
-
-            alert("Eligibility updated successfully!");
+        } catch (err) {
+            message.error("Failed to save eligibility");
+            console.error(err);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -427,8 +569,11 @@ const Eligibility = () => {
     }, []);
 
     useEffect(() => {
-        loadExistingEligibility();
+        loadExisting();
     }, [configList]);
+
+
+
 
     const eligibilityOptions = configList
         .filter(val => val?.MarkAsMain === true)
@@ -440,70 +585,73 @@ const Eligibility = () => {
 
     return (
         <div>
-            <div className={styles.EligibleHeader}>
 
-                <div className={styles.Eligiblebox}>
-                    <SelectField
-                        label="Select Eligibility"
-                        value={formData.eligibility}
-                        options={eligibilityOptions}
-                        onChange={handleEligibilityChange}
-                    />
-                </div>
-
-                <p className={styles.EligibleTag}>{"Eligible"}</p>
-
-            </div>
-
-            {formData.eligibility && (
-
+            {isLoading ? <Loader></Loader> :
                 <>
-                    <div className={styles.checkboxContainer}>
-                        <p className={styles.Checkboxheader}>Each box must be met for eligibility in the Supportive Housing Program</p>
-                        <CheckpointGroup
-                            // label="Treatment Modality"
-                            options={checkpointOptions.map(cp => cp.CriteriaPoints)}
-                            value={selectedCriteriaPoints}
-                            onChange={(selectedPoints) => {
-                                const ids = checkpointOptions
-                                    .filter(cp => (selectedPoints as string[]).includes(cp.CriteriaPoints))
-                                    .map(cp => cp.Id);
-                                handleChange("checkpoints", ids);
-                            }}
-                            multiple
-                            direction="vertical"
-                        />
+                    <div className={styles.EligibleHeader}>
+
+                        <div className={styles.Eligiblebox}>
+                            <SelectField
+                                label="Select Eligibility"
+                                value={formData.eligibility}
+                                options={eligibilityOptions}
+                                onChange={handleEligibilityChange}
+                            />
+                        </div>
+
+                        <p className={styles.EligibleTag}>{"Eligible"}</p>
+
                     </div>
 
+                    {formData.eligibility && (
 
-                    <div dangerouslySetInnerHTML={{ __html: descriptionHtml }} />
-
-                    <div style={{ marginTop: 16, width: "220px" }}>
-                        <SelectField
-                            label="Status"
-                            onChange={val => handleChange("status", val)}
-                            value={formData.status}
-                            options={[
-                                { label: "Eligible", value: "Eligible" },
-                                { label: "Ineligible", value: "Ineligible" }
-                            ]}
-                        />
-                    </div>
-
-                    <div style={{ marginTop: 16 }}>
-                        <TextAreaField
-                            label="Comments"
-                            rows={4}
-                            value={formData.comments}
-                            onChange={(val) => handleChange("comments", val)}
-                        />
-                    </div>
+                        <>
+                            <div className={styles.checkboxContainer}>
+                                <p className={styles.Checkboxheader}>Each box must be met for eligibility in the Supportive Housing Program</p>
+                                <CheckpointGroup
+                                    // label="Treatment Modality"
+                                    options={checkpointOptions.map(cp => cp.CriteriaPoints)}
+                                    value={selectedCriteriaPoints}
+                                    onChange={(selectedPoints) => {
+                                        const ids = checkpointOptions
+                                            .filter(cp => (selectedPoints as string[]).includes(cp.CriteriaPoints))
+                                            .map(cp => cp.Id);
+                                        handleChange("checkpoints", ids);
+                                    }}
+                                    multiple
+                                    direction="vertical"
+                                />
+                            </div>
 
 
+                            <div dangerouslySetInnerHTML={{ __html: descriptionHtml }} />
 
-                    <CustomFooterBtn onSubmit={handleSave} />
+                            <div style={{ marginTop: 16, width: "220px" }}>
+                                <SelectField
+                                    label="Status"
+                                    onChange={val => handleChange("status", val)}
+                                    value={formData.status}
+                                    options={[
+                                        { label: "Eligible", value: "Eligible" },
+                                        { label: "Ineligible", value: "Ineligible" }
+                                    ]}
+                                />
+                            </div>
 
-                    {/* <CustomButton
+                            <div style={{ marginTop: 16 }}>
+                                <TextAreaField
+                                    label="Comments"
+                                    rows={4}
+                                    value={formData.comments}
+                                    onChange={(val) => handleChange("comments", val)}
+                                />
+                            </div>
+
+
+
+                            <CustomFooterBtn onSubmit={handleSave} />
+
+                            {/* <CustomButton
                         label="Save"
                         type="primary"
                         bgColor="#b78e1a"
@@ -511,8 +659,10 @@ const Eligibility = () => {
                         onClick={handleSave}
                         style={{ border: "1px solid #b78e1a !important" }}
                     /> */}
+                        </>
+                    )}
                 </>
-            )}
+            }
         </div>
     );
 };

@@ -4,6 +4,7 @@ export interface ListName {
   Appointments: string;
   ServiceType: string;
   CaseNotes: string;
+  Diagnostics: string;
 }
 
 export interface SelectOption {
@@ -41,9 +42,9 @@ export interface CompleteCaseForm {
   FromDateTime: string;
   ToDateTime: string;
   Occupation: string;
+  DefaultServiceType: string[];
   ServiceType: string[];
-  CServiceType: string[];
-  AServiceType: string[];
+  // AServiceType: string[];
   Relationship: string;
   ContactDetails: SelectOption | null;
   ContactPreference: SelectOption | null;
@@ -73,8 +74,8 @@ export interface CompleteCaseForm {
 
   // People picker fields
   CaseManager: PeoplePickerUser | null;
-  CCaseManager: PeoplePickerUser | null;
-  ACaseManager: PeoplePickerUser | null;
+  // CCaseManager: PeoplePickerUser | null;
+  // ACaseManager: PeoplePickerUser | null;
   CaseManagerId?: number | any;
   ExistingClient?: SelectOption | null;
 }
@@ -83,8 +84,8 @@ export interface cases {
   Id: number | string;
   Description: string;
   CaseName: string;
-  CCaseManager: PeoplePickerUser | null;
-  CCServiceType: SelectOption[] | null;
+  CaseManager: PeoplePickerUser | null;
+  ServiceType: SelectOption[] | null;
   ClientId?: number | null;
   Status?: string;
   Date?: string | Date;
@@ -106,6 +107,15 @@ export interface CaseNoteItem {
 export interface GroupedNotes {
   month: string;
   items: CaseNoteItem[];
+}
+
+//Document
+export interface ICaseDocument {
+  key: string;
+  name: string;
+  date: string;
+  status: string;
+  url: string;
 }
 
 // case manager interfaces
@@ -169,4 +179,63 @@ export interface IClientDetails {
   Referral: SelectOption;
   maritalStatus: SelectOption;
   Religion: string;
+}
+
+export interface DiagnosticCode {
+  ID: number | any;
+  DCode: string;
+  Description: string;
+  Classification: SelectOption | null;
+  BillableType: SelectOption | null;
+  CaseId: number | any;
+}
+
+export interface ITreatmentPlan {
+  ID: number | null;
+  BehavioralDefinition: string;
+  TreatmentDuration: string;
+  InitiationDate: string;
+  ReferralService: string;
+  AppointmentsFrequency: string;
+  TreatmentModality: string[];
+  CaseId?: number | any; // optional for new entries
+}
+
+export interface IRiskAssessment {
+  ID?: number | null;
+  PresentingProblem: string;
+  ClientIntakeDate: string; // ISO or string
+  DiagnosticsDate: string;
+  Observations: string;
+  PertinentHistory: string;
+  FamilyPsychosocialAssessment: string;
+  Strengths: string;
+  RiskExplanation: string;
+  ContractSafteyPlan: string;
+  SafteyPlanExplanation: string;
+  TentativeGoalsAndPlans: string;
+  RiskIndicators: string[]; // multi-choice
+  CaseId?: number | null; // lookup id
+}
+export interface IMasterClientDetails {
+  Id: number;
+  FirstName: string;
+  LastName: string;
+  Gender: SelectOption;
+  DateOfBirth: string;
+  ServiceTypes: SelectOption[] | [];
+  ClientID: string;
+  HomePhoneNo: string;
+  MobilePhoneNo: string;
+  WorkPhoneNo: string;
+  EmailId: string;
+  Location: string;
+  City: string;
+  State: string;
+  Address: string;
+  HealthInsurance: SelectOption;
+  Referral: SelectOption;
+  MaritalStatus: SelectOption;
+  Religion: SelectOption;
+  Status?: string;
 }

@@ -51,8 +51,8 @@ const AllCases = () => {
 
         {
             title: "Service Type",
-            dataIndex: "CCServiceType",
-            key: "CCServiceType",
+            dataIndex: "ServiceType",
+            key: "ServiceType",
             width: 250,
 
             render: (types: SelectOption[]) =>
@@ -77,8 +77,8 @@ const AllCases = () => {
 
         {
             title: "Case Manager",
-            dataIndex: "CCaseManager",
-            key: "CCaseManager",
+            dataIndex: "CaseManager",
+            key: "CaseManager",
             width: 200,
             render: (manager) => {
                 if (!manager) return "—";
@@ -205,7 +205,10 @@ const AllCases = () => {
 
     return (
 
-        <>
+        <div style={{
+            background: "#ffff",
+            padding: "16px"
+        }}>
 
             <PageHeader
                 title="All Cases"
@@ -231,7 +234,7 @@ const AllCases = () => {
                 onRowClick={(record) => console.log("Row clicked:", record)}
 
             />
-        </>
+        </div>
     );
 };
 

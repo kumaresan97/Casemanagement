@@ -73,7 +73,12 @@ const PeoplePickerField: React.FC<PeoplePickerFieldProps> = ({
                     resolveDelay={300}
                 />
             </div>
-            {error && <div className="error-message">{error}</div>}
+            {error ? (
+                <div className="error-message">{error}</div>
+            ) : (
+                <div style={{ height: "23px" }}></div>
+            )}
+            {/* {error && <div className="error-message">{error}</div>} */}
 
         </div>
     );

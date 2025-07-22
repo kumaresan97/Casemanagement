@@ -14,6 +14,9 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getCaseDocuments, uploadFilesToLibrary } from "../../../Service/AllCases/AllCaseService";
 import CustomButton from "../../../Components/Button/CustomButton";
+import CustomTooltip from "../../../Components/Tooltip/CustomTooltip";
+import { ColumnsType } from "antd/es/table";
+import { ICaseDocument } from "../../../Types/Type";
 
 
 
@@ -26,13 +29,15 @@ const Documents = () => {
     console.log("Selected Case:", selectedCase);
     const [visible, setVisible] = useState(false);
     const [fileList, setFileList] = useState<UploadFile[]>([]);
-    const [documentsData, setDocumentsData] = useState<any[]>([]);
+    const [documentsData, setDocumentsData] = useState<ICaseDocument[]>([]);
     let caseFolderName = `Case-${selectedCase.Id}-${selectedCase.CaseName}`.replace(
         /\s+/g,
         ""
     );
     const loadDocuments = async () => {
         const data = await getCaseDocuments(caseFolderName);
+        console.log("Documents: ", data);
+
         setDocumentsData(data);
     };
 
@@ -62,65 +67,94 @@ const Documents = () => {
     };
 
 
-    // const documentsData = [
-    //     {
-    //         key: "1",
-    //         name: "Casenotes.pdf",
-    //         date: "12/05/2025",
-    //         status: "Pending",
-    //     },
-    //     {
-    //         key: "2",
-    //         name: "Eligibility.pdf",
-    //         date: "12/05/2025",
-    //         status: "Pending",
-    //     },
-    //     {
-    //         key: "3",
-    //         name: "Diagnostics.pdf",
-    //         date: "12/05/2025",
-    //         status: "Pending",
-    //     },
-    // ];
-    const documentsColumns = [
-        {
-            title: <input type="checkbox" />, // header checkbox
-            dataIndex: "checkbox",
-            key: "checkbox",
-            render: () => <input type="checkbox" />,
-            width: 50,
-        },
+    const documentsColumns: ColumnsType<ICaseDocument> = [
+        // {
+        //     title: <input type="checkbox" />, // header checkbox
+        //     dataIndex: "checkbox",
+        //     key: "checkbox",
+        //     render: () => <input type="checkbox" />,
+        //     width: 50,
+        // },
+
         {
             title: "Document name",
             dataIndex: "name",
             key: "name",
+            width: 150,
+            fixed: "left",
+
+            ellipsis: true, // enables built-in ellipsis
+            render: (text: string) => (
+                <CustomTooltip title={text} >
+                    <span
+                        style={{
+                            display: "inline-block",
+                            // maxWidth: "100%",
+                            maxWidth: 150,
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                        }}
+                    >
+                        {text}
+                    </span>
+                </CustomTooltip>
+            ),
         },
+
         {
             title: "Date",
             dataIndex: "date",
             key: "date",
+            width: 250
         },
-        {
-            title: "Status",
-            dataIndex: "status",
-            key: "status",
-            render: (text: string) => (
-                <span >
-                    {text}
-                </span>
-            ),
-        },
+        // {
+        //     title: "Status",
+        //     dataIndex: "status",
+        //     key: "status",
+        //     render: (text: string) => (
+        //         <span >
+        //             {text}
+        //         </span>
+        //     ),
+        // },
+
         {
             title: "Action",
             dataIndex: "action",
             key: "action",
-            render: () => (
-                <div >
-                    <EyeOutlined style={{ marginRight: 10, color: "#000" }} />
-                    <DownloadOutlined style={{ color: "#f0b400" }} />
+            width: 150,
+            render: (_: any, record: any) => (
+                <div>
+                    <a
+                        href={record.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ marginRight: 10 }}
+                    >
+                        <EyeOutlined style={{ color: "#b78e1a" }} />
+                    </a>
+                    <a
+                        href={record.url}
+                        download
+                    >
+                        <DownloadOutlined style={{ color: "#b78e1a" }} />
+                    </a>
                 </div>
             ),
-        },
+        }
+
+        // {
+        //     title: "Action",
+        //     dataIndex: "action",
+        //     key: "action",
+        //     render: () => (
+        //         <div >
+        //             <EyeOutlined style={{ marginRight: 10, color: "#000" }} />
+        //             <DownloadOutlined style={{ color: "#f0b400" }} />
+        //         </div>
+        //     ),
+        // },
     ];
 
     useEffect(() => {
@@ -141,7 +175,8 @@ const Documents = () => {
             </div>
 
 
-            <CommonTable columns={documentsColumns}
+            <CommonTable<ICaseDocument>
+                columns={documentsColumns}
                 data={documentsData}
 
             />

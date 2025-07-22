@@ -171,17 +171,17 @@ const CreateNewCase: React.FC<CreateNewCaseProps> = ({ mode, initialData }) => {
         {
             title: 'Client Details',
             component: ClientDetails,
-            requiredFields: formData?.ClientType?.value === "Existing" ? ["ExistingClient"] : ['FirstName', 'LastName', 'PreferredName', 'ServiceType', 'MobilePhone', 'Email', 'EEmail', 'EMobilePhone'],
+            requiredFields: formData?.ClientType?.value === "Existing" ? ["ExistingClient"] : ['FirstName', 'LastName', 'PreferredName', 'DefaultServiceType', 'MobilePhone', 'Email', 'EEmail', 'EMobilePhone'],
         },
         {
             title: 'Case Notes',
             component: CaseNotes,
-            requiredFields: ['CaseName', 'CServiceType', 'CCaseManager', 'Description'],
+            requiredFields: ['CaseName', 'ServiceType', 'CaseManager', 'Description'],
         },
         {
             title: 'Appointment',
             component: Appointment,
-            requiredFields: ['FromDateTime', 'ToDateTime', 'BillableType', 'AServiceType', 'ACaseManager'],
+            requiredFields: ['FromDateTime', 'ToDateTime', 'BillableType', 'ServiceType', 'CaseManager'],
         },
     ];
 

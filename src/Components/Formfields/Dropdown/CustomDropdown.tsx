@@ -150,7 +150,6 @@ const SelectField: React.FC<FieldProps> = ({
   disabled = false,
   disableWrapper = false,
 }) => {
-  console.log("disabled", disabled);
 
   const handleChange = (val: any) => {
     if (multiple) {

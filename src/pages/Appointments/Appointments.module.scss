@@ -44,3 +44,20 @@
     border-radius: 5px;
     font-size: 13px;
 }
+
+.completed_pill{
+    background: #94ce94;
+    padding: 0px 15px 2px 15px;
+    border-radius: 50px;
+    color: #165316;
+    font-weight: 500;
+    font-size: 13px;
+}
+.inprogress_pill{
+    background: #f1c40f;
+    padding: 0px 15px 2px 15px;
+    border-radius: 50px;
+    color: #5a4d00;
+    font-weight: 500;
+    font-size: 13px;
+}

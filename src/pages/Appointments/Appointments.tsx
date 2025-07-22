@@ -11,6 +11,7 @@ import { PlusCircleOutlined } from "@ant-design/icons";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
 import { formatDate } from "@fullcalendar/core";
 import { Button, Card, Modal } from "antd";
 import { cases, IAppointmentDetails } from "../../Types/Type";
@@ -38,19 +39,19 @@ import { useSelector } from "react-redux";
 const appointmentDetails = {
   Id: 0,
   Case: {
-    value: null,
+    value: 0,
     label: "",
   },
-  ServiceTypes: [],
+  ServiceTypes: [] as any[], // Explicitly type as any[]
   AppointmentSDateTime: "",
   AppointmentEDateTime: "",
   CaseManager: {
-    id: null,
+    id: 0,
     email: "",
     name: "",
   },
   BillableType: {
-    value: null,
+    value: "",
     label: "",
   },
   Notes:
@@ -81,7 +82,9 @@ const Appointments: React.FC = () => {
   const [tempAppointments, setTempAppointments] = useState<
     IAppointmentDetails[]
   >([]);
-  const [upComingAppointments, setUpComingAppointments] = useState<any[]>([]);
+  const [upComingAppointments, setUpComingAppointments] = useState<
+    IAppointmentDetails[]
+  >([]);
   const [popupControl, setPopupControl] = useState<boolean>(false);
   console.log("masterAppointments", masterAppointments);
   console.log("tempAppointments", tempAppointments);
@@ -95,12 +98,14 @@ const Appointments: React.FC = () => {
     setFormData(appointmentDetails);
   };
 
-  const bindUpcomingAppointments = async () => {
+  const bindTodayAppointments = async () => {
+    const today = dayjs().format("YYYY-MM-DD");
     const upcomingAppointments = tempAppointments
       .filter((item) => {
-        const appointmentStart = new Date(item.AppointmentSDateTime);
-        const now = new Date();
-        return appointmentStart >= now;
+        const appointmentDate = dayjs(item.AppointmentSDateTime).format(
+          "YYYY-MM-DD"
+        );
+        return appointmentDate === today;
       })
       .sort((a, b) => {
         return (
@@ -132,7 +137,7 @@ const Appointments: React.FC = () => {
   }, []);
   useEffect(() => {
     console.log("rendered");
-    bindUpcomingAppointments();
+    bindTodayAppointments();
   }, [tempAppointments]);
   useEffect(() => {
     console.log("rendered");
@@ -255,9 +260,22 @@ const Appointments: React.FC = () => {
         },
         Notes: selectedEvent?.extendedProps?.caseNotes,
       });
-
       setPopupControl(true);
     }
+  };
+
+  const handleDateClick = (arg: { date: Date }) => {
+    const clickedDate = dayjs(arg.date).format("YYYY-MM-DD");
+
+    const matchedEvents = tempAppointments.filter(
+      (event) =>
+        dayjs(event.AppointmentSDateTime).format("YYYY-MM-DD") === clickedDate
+    );
+
+    console.log("Events for clicked date:", clickedDate, matchedEvents);
+    setUpComingAppointments(matchedEvents);
+
+    // Optional: set in state and show in modal
   };
 
   const handleOk = () => {
@@ -278,8 +296,8 @@ const Appointments: React.FC = () => {
       });
       setFormData((prev: any) => ({
         ...prev,
-        CaseManager: filteredDetails[0]?.CCaseManager,
-        ServiceTypes: filteredDetails[0]?.CCServiceType,
+        CaseManager: filteredDetails[0]?.CaseManager,
+        ServiceTypes: filteredDetails[0]?.ServiceType,
       }));
     }
     setResponseState((prev) => {
@@ -316,6 +334,23 @@ const Appointments: React.FC = () => {
     }
   };
 
+  const getAppointmentStatus = (
+    startDateTime: string,
+    endDateTime: string
+  ): "completed" | "inprogress" | "upcoming" => {
+    const now = dayjs();
+    const start = dayjs(startDateTime);
+    const end = dayjs(endDateTime);
+
+    if (now.isBefore(start)) {
+      return "upcoming";
+    } else if (now.isAfter(end)) {
+      return "completed";
+    } else {
+      return "inprogress";
+    }
+  };
+
   return (
     <div className={styles.appointments_Container}>
       <PageHeader
@@ -340,7 +375,7 @@ const Appointments: React.FC = () => {
       >
         <div style={{ width: "75%" }}>
           <FullCalendar
-            plugins={[dayGridPlugin, timeGridPlugin]}
+            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             initialView="dayGridMonth"
             events={mappedEvents}
             dayMaxEventRows={2}
@@ -348,6 +383,7 @@ const Appointments: React.FC = () => {
             moreLinkClick="popover"
             eventContent={renderEventContent}
             eventClick={handleEventClick}
+            dateClick={handleDateClick}
           />
         </div>
         <div
@@ -355,7 +391,7 @@ const Appointments: React.FC = () => {
           style={{ width: "25%", padding: "0px 0px 0px 15px" }}
         >
           <h3 style={{ margin: "0px", padding: "5px 0px 10px 0px" }}>
-            Upcoming Appointments
+            Appointments
           </h3>
           <div
             className={styles.upcoming_appointment_container}
@@ -363,29 +399,54 @@ const Appointments: React.FC = () => {
           >
             {upComingAppointments?.length === 0 && (
               <div style={{ textAlign: "center", color: "gray" }}>
-                No upcoming appointments
+                No appointments
               </div>
             )}
             {upComingAppointments.map((appt) => {
               const start = dayjs(appt.AppointmentSDateTime);
               const end = dayjs(appt.AppointmentEDateTime);
+              const status = getAppointmentStatus(
+                appt.AppointmentSDateTime,
+                appt.AppointmentEDateTime
+              );
               return (
                 <Card
                   key={appt.Id}
                   style={{
                     border: "none",
-                    borderLeft: "3px solid #cfa21e",
-                    borderRadius: "0px 10px 10px 0px",
+                    // borderLeft: "3px solid #cfa21e",
+                    // borderRadius: "0px 10px 10px 0px",
                   }}
                 >
                   <div
                     style={{ display: "flex", alignItems: "center", gap: 10 }}
                   >
-                    <div style={{ textAlign: "center", width: 50 }}>
-                      <div style={{ fontSize: 20, fontWeight: 600 }}>
+                    <div
+                      style={{
+                        textAlign: "center",
+                        width: 50,
+                        // border: "1px solid #bec7e9",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: 20,
+                          fontWeight: 600,
+                          backgroundColor: "#7d77ea",
+                          color: "#fff",
+                          borderRadius: "5px 5px 0px 0px",
+                        }}
+                      >
                         {start.format("DD")}
                       </div>
-                      <div style={{ color: "#1890ff", fontWeight: 500 }}>
+                      <div
+                        style={{
+                          fontWeight: 500,
+                          color: "#7d77ea",
+                          backgroundColor: "#f8f1dd",
+                          borderRadius: "0px 0px 5px 5px",
+                        }}
+                      >
                         {start.format("ddd")}
                       </div>
                     </div>
@@ -429,44 +490,79 @@ const Appointments: React.FC = () => {
                     >
                       {start.format("hh:mm A")} to {end.format("hh:mm A")}
                     </span>
-                    <div
-                      style={{
-                        display: "flex",
-                      }}
-                    >
-                      <CustomTooltip title="Edit" width={100} placement="top">
-                        <EditIcon
-                          onClick={() => console.log("Edit")}
-                          sx={{
-                            cursor: "pointer",
-                            backgroundColor: "#e3f2fd",
-                            padding: "4px",
-                            borderRadius: "6px",
-                            marginRight: "8px",
-                            fontSize: "24px",
-                            "&:hover": {
-                              backgroundColor: "#bbdefb",
-                            },
-                          }}
-                        />
-                      </CustomTooltip>
-                      <CustomTooltip title="Delete">
-                        <DeleteIcon
-                          onClick={() => console.log("Delete")}
-                          sx={{
-                            cursor: "pointer",
-                            backgroundColor: "#ffebee",
-                            padding: "4px",
-                            borderRadius: "6px",
-                            fontSize: "24px",
-                            color: "#f44336",
-                            "&:hover": {
-                              backgroundColor: "#ffcdd2",
-                            },
-                          }}
-                        />
-                      </CustomTooltip>
-                    </div>
+                    {status === "upcoming" ? (
+                      <div
+                        style={{
+                          display: "flex",
+                        }}
+                      >
+                        <CustomTooltip title="Edit" width={100} placement="top">
+                          <EditIcon
+                            onClick={() => {
+                              setFormData({
+                                ...formData,
+                                Id: Number(appt?.Id),
+                                Case: {
+                                  value: Number(appt?.Case?.value),
+                                  label: appt?.Case?.label,
+                                },
+                                AppointmentSDateTime: moment(
+                                  appt?.AppointmentSDateTime
+                                ).format("YYYY-MM-DD HH:mm:ss"),
+                                AppointmentEDateTime: moment(
+                                  appt?.AppointmentEDateTime
+                                ).format("YYYY-MM-DD HH:mm:ss"),
+                                ServiceTypes: appt?.ServiceTypes,
+                                CaseManager: appt?.CaseManager
+                                  ? {
+                                      id: Number(appt?.CaseManager?.id),
+                                      email: appt?.CaseManager?.email ?? "",
+                                      name: appt?.CaseManager?.name ?? "",
+                                    }
+                                  : { id: 0, email: "", name: "" },
+                                BillableType: {
+                                  value: String(appt?.BillableType?.value),
+                                  label: String(appt?.BillableType?.value),
+                                },
+                                Notes: appt?.Notes ?? "",
+                              });
+                              setPopupControl(true);
+                            }}
+                            sx={{
+                              cursor: "pointer",
+                              backgroundColor: "#e3f2fd",
+                              padding: "4px",
+                              borderRadius: "6px",
+                              marginRight: "8px",
+                              fontSize: "24px",
+                              "&:hover": {
+                                backgroundColor: "#bbdefb",
+                              },
+                            }}
+                          />
+                        </CustomTooltip>
+                        <CustomTooltip title="Delete">
+                          <DeleteIcon
+                            onClick={() => console.log("Delete")}
+                            sx={{
+                              cursor: "pointer",
+                              backgroundColor: "#ffebee",
+                              padding: "4px",
+                              borderRadius: "6px",
+                              fontSize: "24px",
+                              color: "#f44336",
+                              "&:hover": {
+                                backgroundColor: "#ffcdd2",
+                              },
+                            }}
+                          />
+                        </CustomTooltip>
+                      </div>
+                    ) : status === "inprogress" ? (
+                      <div className={styles.inprogress_pill}>In progress</div>
+                    ) : (
+                      <div className={styles.completed_pill}>Completed</div>
+                    )}
                   </div>
                 </Card>
               );

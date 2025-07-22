@@ -1,43 +1,196 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
+
 import * as React from "react"
 import styles from "../Case.module.scss"
 import InputField from "../../../Components/Formfields/Textfield/CustomTextfield";
 import DatePickerField from "../../../Components/Formfields/Calendar/CustomCalendar";
 import TextAreaField from "../../../Components/Formfields/TextArea/CustomTextArea";
 import CheckpointGroup from "../../../Components/Formfields/Checkbox/CustomCheckbox";
+import { useParams } from "react-router-dom";
+import { addTreatmentPlan, getDiagnosticCode, loadDataByCaseId, updateTreatmentPlan } from "../../../Service/AllCases/AllCaseService";
+import { DiagnosticCode, ITreatmentPlan } from "../../../Types/Type";
+import { useState } from "react";
+import CustomButton from "../../../Components/Button/CustomButton";
+import CustomLoader from "../../../Components/Loader/Loader";
 const TreatmentPlans = () => {
-    const diagnoses = [
-        "V60.9 (Z59.9) Unspecified Housing",
-        "V60.2 (Z59.6) Low Income",
-        "V65.42 (Z71.41) Alcohol abuse"
-    ];
+
+    const [diagnoses, setDiagnoses] = useState<DiagnosticCode[]>([])
+    const [existingItemId, setExistingItemId] = useState<number | null>(null);
+    const [isloading, setisLoading] = useState<boolean>(false)
+
+    const [formData, setFormData] = useState<ITreatmentPlan>({
+        ID: null,
+        BehavioralDefinition: "",
+        TreatmentDuration: "",
+        InitiationDate: "",
+        ReferralService: "",
+        AppointmentsFrequency: "",
+        TreatmentModality: [],
+        CaseId: null
+    });
+
+    const { id } = useParams()
+    const init = async () => {
+        setisLoading(true)
+        const TPlans = await loadDataByCaseId(Number(id))
+        const Diagonstic = await getDiagnosticCode(Number(id))
+        Diagonstic && setDiagnoses(Diagonstic)
+        TPlans && setFormData(TPlans)
+        if (TPlans) {
+            setExistingItemId(TPlans.ID || null);
+
+        }
+        else {
+            setExistingItemId(null);
+
+        }
+        setisLoading(false)
+
+    }
+
+    const handleChange = (field: keyof ITreatmentPlan, value: any) => {
+        setFormData(prev => ({
+            ...prev,
+            [field]: value,
+        }));
+    };
+
+    const handleSubmit = async () => {
+        //   const { isValid, errors } = validateTreatmentPlan(formData);
+        //   if (!isValid) {
+        //     console.warn(errors);
+        //     return;
+        //   }
+        setisLoading(true)
+
+        if (existingItemId) {
+            await updateTreatmentPlan(existingItemId, formData, setisLoading);
+            await init()
+
+
+        } else {
+            await addTreatmentPlan(formData, Number(id), setisLoading);
+            await init()
+
+        }
+    };
+
+
+    React.useEffect(() => {
+        init()
+    }, [])
     return (
-        <div className={styles.treatmentPlansWrapper}>
-            {/* Diagnostics Section */}
-            <div className={styles.diagnosisSection}>
-                <label className={styles.sectionLabel}>Diagnostics Impressions</label>
-                <div className={styles.diagnosisList}>
-                    {diagnoses.map((diag, index) => (
-                        <div key={index} className={styles.diagnosisItem}>
-                            {diag}
+
+        <>
+            {isloading ? <CustomLoader></CustomLoader> :
+
+                <div className={styles.treatmentPlansWrapper}>
+                    {/* Diagnostics Section */}
+                    <div className={styles.diagnosisSection}>
+                        <label className={styles.sectionLabel}>Diagnostics Impressions</label>
+                        <div className={styles.diagnosisList}>
+                            {diagnoses.map((diag, index) => (
+                                <div key={index} className={styles.diagnosisItem}>
+                                    {diag?.DCode}
+                                </div>
+                            ))}
                         </div>
-                    ))}
-                </div>
-            </div>
+                    </div>
 
-            <div className={styles.rowContainer}>
+                    <div className={styles.rowContainer}>
 
-                <div className={styles.columns}>
-                    <TextAreaField label="Behavioral Definition" rows={4} disableWrapper />
+                        <div className={styles.columns}>
+                            <TextAreaField label="Behavioral Definition" rows={4} disableWrapper
+                                value={formData?.BehavioralDefinition}
+                                onChange={(val) => {
+                                    handleChange("BehavioralDefinition", val)
 
-
-
-                </div>
-                <div className={styles.columns}>
-                    <div style={{ display: "flex", flexDirection: "column" }}>
+                                }}
+                            />
 
 
-                        <InputField label="Expected Length of Treatment" disableWrapper />
-                        <DatePickerField label="Initiation Date" disableWrapper />
+
+                        </div>
+                        <div className={styles.columns}>
+                            <div style={{ display: "flex", flexDirection: "column" }}>
+
+
+                                <InputField label="Expected Length of Treatment" disableWrapper
+
+                                    value={formData?.TreatmentDuration}
+                                    onChange={(val) => {
+                                        handleChange("TreatmentDuration", val)
+
+                                    }}
+                                />
+                                <DatePickerField label="Initiation Date" disableWrapper
+
+                                    value={formData?.InitiationDate || ""}
+                                    onChange={(val) => {
+                                        handleChange("InitiationDate", val)
+
+                                    }}
+
+                                />
+
+                            </div>
+
+
+
+
+
+
+
+
+
+                        </div>
+                        <div className={styles.columns}>
+
+                            <CheckpointGroup
+                                label="Treatment Modality"
+                                options={["Suicide", "Violence", "Physical abuse", "Sexual abuse"]}
+                                onChange={(val) => handleChange("TreatmentModality", val)}
+                                multiple
+                                value={formData.TreatmentModality}
+                                direction="vertical"
+                            />
+
+
+                        </div>
+                    </div>
+
+                    <div className={styles.rowContainer}>
+
+
+                        <div className={styles.columns}>
+
+                            <TextAreaField label="Referral for Additional Services"
+                                rows={4} disableWrapper
+
+                                value={formData?.ReferralService}
+                                onChange={(val) => {
+                                    handleChange("ReferralService", val)
+
+                                }}
+
+                            />
+                        </div>
+                        <div className={styles.columns}>
+
+                            <InputField label="Appointments Frequency" disableWrapper
+
+                                value={formData?.AppointmentsFrequency}
+                                onChange={(val) => {
+                                    handleChange("AppointmentsFrequency", val)
+
+                                }}
+
+                            />
+
+                        </div>
+                    </div>
+                    <div className={styles.footer}>
+                        <CustomButton label="Submit" type="primary" onClick={handleSubmit} />
 
                     </div>
 
@@ -48,42 +201,9 @@ const TreatmentPlans = () => {
 
 
 
-
                 </div>
-                <div className={styles.columns}>
-
-                    <CheckpointGroup
-                        label="Treatment Modality"
-                        options={["Suicide", "Violence", "Physical abuse", "Sexual abuse"]}
-                        onChange={(val) => console.log(val, "val")}
-                        multiple
-                        direction="vertical"
-                    />
-
-
-                </div>
-            </div>
-
-            <div className={styles.rowContainer}>
-
-
-                <div className={styles.columns}>
-
-                    <TextAreaField label="Referral for Additional Services"
-                        rows={4} disableWrapper />
-                </div>
-                <div className={styles.columns}>
-
-                    <InputField label="Appointments Frequency" disableWrapper />
-
-                </div>
-            </div>
-
-
-
-
-
-        </div>
+            }
+        </>
     )
 }
 export default TreatmentPlans;

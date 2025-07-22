@@ -423,7 +423,7 @@ textarea {
 
 /* formField.scss */
 .field-wrapper {
-  margin-bottom: 12px;
+  /* margin-bottom: 12px; */
 }
 
 .label {
@@ -776,31 +776,66 @@ textarea {
 } */
 
 .ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: #f5b301 !important;
-  text-shadow: 0 0 0.25px #f5b301 !important;
+  color: #b78e1a !important;
+  text-shadow: 0 0 0.25px #b78e1a !important;
   /* font-weight: 600; */
 }
 
 .ant-tabs-ink-bar {
-  background: #f5b301;
+  background: #b78e1a;
 }
 .ant-tabs-tab:hover {
-  color: #f5b301 !important;
+  color: #b78e1a !important;
 }
 
 .ant-btn:hover,
 .ant-btn:focus {
+  color: inherit !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  background: inherit !important;
+}
+.ant-btn-primary {
+  border: none !important;
   color: #fff !important;
+  /* background: none !important; */
+  box-shadow: none !important;
 }
 
 .ant-btn-primary:hover,
 .ant-btn-primary:focus {
   border: none !important;
+  color: #fff !important;
+  background: #b78e1a !important;
+
+  /* background: inherit !important; */
 
   /* background: #f5b301 !important; */
 }
 
 .ant-checkbox-checked .ant-checkbox-inner {
-  background: #f5b301 !important;
-  border: #f5b301 !important;
+  background: #b78e1a !important;
+  border: #b78e1a !important;
+  box-shadow: none !important;
 }
+
+/* .appointment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+
+  .form-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+
+    &.full-width {
+      flex-direction: column;
+    }
+
+    .half-width {
+      flex: 1;
+      min-width: 280px;
+    }
+  }
+} */

@@ -7,6 +7,7 @@ export namespace constants {
     Appointments: "Appointments",
     ServiceType: "ServiceType",
     CaseNotes: "CaseNotes",
+    Diagnostics: "Diagnostics",
   };
 }
 
@@ -34,9 +35,9 @@ export const initialFormData: CompleteCaseForm = {
   FromDateTime: "",
   ToDateTime: "",
   Occupation: "",
+  DefaultServiceType: [],
   ServiceType: [],
-  CServiceType: [],
-  AServiceType: [],
+  // AServiceType: [],
   Relationship: "",
   ContactDetails: { label: "", value: "" } || null,
   ContactPreference: { label: "", value: "" } || null,
@@ -66,20 +67,20 @@ export const initialFormData: CompleteCaseForm = {
 
   // People
   CaseManager: null,
-  CCaseManager: null,
-  ACaseManager: null,
+  // CCaseManager: null,
+  // ACaseManager: null,
 };
 
 export const Cases: cases = {
   Id: "",
   Description: "",
   CaseName: "",
-  CCaseManager: {
+  CaseManager: {
     id: "",
     name: "",
     email: "",
   },
-  CCServiceType: [{ label: "", value: "" }],
+  ServiceType: [{ label: "", value: "" }],
   ClientId: null,
   Status: "",
   Date: "",

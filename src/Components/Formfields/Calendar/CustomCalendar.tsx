@@ -11,10 +11,11 @@ interface FieldProps {
     error?: string;
     onChange?: (value: string) => void;
     disableWrapper?: boolean;
-    disabled?: boolean
+    disabled?: boolean;
+    showtime?: boolean
 }
 
-const DatePickerField: React.FC<FieldProps> = ({ label, required, value, error, onChange, disableWrapper = false, disabled = false }) => {
+const DatePickerField: React.FC<FieldProps> = ({ label, required, value, error, onChange, disableWrapper = false, disabled = false, showtime = true }) => {
     return (
         <div className={disableWrapper ? "" : "field-wrapper"}>
             <label className="label">
@@ -22,11 +23,17 @@ const DatePickerField: React.FC<FieldProps> = ({ label, required, value, error, 
             </label>
             <DatePicker
                 disabled={disabled}
+                // showTime
                 style={{ width: '100%' }}
                 value={value ? moment(value) : null}
                 onChange={(date, dateString) => onChange?.(dateString)}
             />
-            {error && <div className="error-message">{error}</div>}
+            {error ? (
+                <div className="error-message">{error}</div>
+            ) : (
+                <div style={{ height: "23px" }}></div>
+            )}
+            {/* {error && <div className="error-message">{error}</div>} */}
         </div>
     );
 };

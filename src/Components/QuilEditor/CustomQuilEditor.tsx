@@ -8,6 +8,9 @@ interface CustomEditorProps {
     onChange: (value: string) => void;
     placeholder?: string;
     readOnly?: boolean;
+    label?: string;
+    required?: boolean;
+    error?: string;
 }
 
 const CustomEditor: React.FC<CustomEditorProps> = ({
@@ -15,9 +18,17 @@ const CustomEditor: React.FC<CustomEditorProps> = ({
     onChange,
     placeholder = 'Write something...',
     readOnly = false,
+    label,
+    required,
+    error
 }) => {
     return (
         <div className={styles.editorWrapper}>
+
+            {label && <label className="label">
+                {label} {required && <span className="required-star">*</span>}
+            </label>
+            }
             <ReactQuill
                 value={value}
                 onChange={onChange}
@@ -26,6 +37,12 @@ const CustomEditor: React.FC<CustomEditorProps> = ({
                 theme="snow"
             // className={styles.editor}
             />
+
+            {error ? (
+                <div className="error-message">{error}</div>
+            ) : (
+                <div style={{ height: "23px" }}></div>
+            )}
         </div>
     );
 };

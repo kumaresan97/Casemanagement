@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export const isValidEmail = (value: string): boolean =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
@@ -13,6 +15,13 @@ export const isNonEmpty = (value: any): boolean =>
 // export const isValidSelect = (val: any): boolean => {
 //   return val && typeof val === "object" && val.value?.length > 0;
 // };
+
+const DATE_FORMAT = "YYYY-MM-DD HH:mm:ss";
+
+export const isValidFormat = (dateStr: string) =>
+  moment(dateStr, DATE_FORMAT, true).isValid();
+
+export const getTimePart = (dateStr: string) => moment(dateStr).format("HH:mm");
 
 export const isValidSelect = (val: any): boolean => {
   if (!val || typeof val !== "object") return false;

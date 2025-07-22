@@ -16,14 +16,14 @@ export const fetchCaseDeatils = async () => {
         Id: val.Id,
         Description: val.Description || "",
         CaseName: val.CaseName || "",
-        CCaseManager: val?.CCaseManager
+        CaseManager: val?.CaseManager
           ? {
               id: val.CCaseManager.ID || val.CCaseManager.iD,
               email: val.CCaseManager.EMail || val.CCaseManager.email,
               name: val.CCaseManager.Title || val.CCaseManager.name,
             }
           : null,
-        CCServiceType: Array.isArray(val.CServiceType)
+        ServiceType: Array.isArray(val.CServiceType)
           ? val.CServiceType.map((s: any) => ({
               value: s.ID || s.value,
               label: s.Title || s.label,
@@ -88,8 +88,8 @@ export const fetchAppointmentDetails = async (
                 name: appointment?.Author.Title,
               }
             : null,
-          ServiceTypes: appointmentCaseDetails?.CCServiceType,
-          CaseManager: appointmentCaseDetails?.CCaseManager,
+          ServiceTypes: appointmentCaseDetails?.ServiceType,
+          CaseManager: appointmentCaseDetails?.CaseManager,
           BillableType: {
             value: appointment?.BillableType,
             label: appointment?.BillableType,

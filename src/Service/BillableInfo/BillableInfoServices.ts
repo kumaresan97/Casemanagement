@@ -39,8 +39,8 @@ export const fetchBillableDetails = async (
                 name: appointment?.Author.Title,
               }
             : null,
-          ServiceTypes: caseDetails?.CCServiceType ?? [],
-          CaseManager: caseDetails?.CCaseManager ?? null,
+          ServiceTypes: caseDetails?.ServiceType ?? [],
+          CaseManager: caseDetails?.CaseManager ?? null,
           BillableType: {
             value: appointment?.BillableType,
             label: appointment?.BillableType,

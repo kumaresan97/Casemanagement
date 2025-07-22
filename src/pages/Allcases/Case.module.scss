@@ -1,5 +1,58 @@
+// .container {
+//   width: 100%;
+
+//   .wrapper {
+//     display: flex;
+//     gap: 25px;
+
+//     .leftSection,
+//     .rightSection {
+//       display: flex;
+//       flex-direction: column;
+//       gap: 12px; // space between rows
+
+//       .row {
+//         display: flex;
+//         // align-items: center;
+//         width: 100%;
+
+//         .left {
+//           width: 30%;
+//           color: #adadad;
+//           font-size: 13px;
+//           font-weight: 400;
+//           font-family: "Intermedium", sans-serif;
+//         }
+
+//         .right {
+//           width: 70%;
+//           span {
+//             color: #030e12;
+//             font-size: 13px;
+//           }
+//         }
+//       }
+//     }
+
+//     .leftSection {
+//       width: 30%;
+//     }
+
+//     .rightSection {
+//       width: 50%;
+//     }
+//   }
+// }
+
 .container {
   width: 100%;
+  position: relative;
+
+  .header {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 0 16px;
+  }
 
   .wrapper {
     display: flex;
@@ -9,11 +62,10 @@
     .rightSection {
       display: flex;
       flex-direction: column;
-      gap: 12px; // space between rows
+      // gap: 12px;
 
       .row {
         display: flex;
-        // align-items: center;
         width: 100%;
 
         .left {
@@ -42,6 +94,18 @@
       width: 50%;
     }
   }
+
+  .footer {
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    padding: 16px 0;
+    margin-top: 24px;
+    display: flex;
+    gap: 12px;
+    border-top: 1px solid #eee;
+    z-index: 5;
+  }
 }
 
 // Tratment plans
@@ -52,45 +116,92 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-}
+  overflow-y: scroll;
 
-.sectionLabel {
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 0.5rem;
-}
+  .sectionLabel {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
 
-.diagnosisSection {
-  display: flex;
-  flex-direction: column;
-
-  .diagnosisList {
+  .diagnosisSection {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    flex-direction: column;
 
-    .diagnosisItem {
-      background-color: #efefef;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 13px;
-      color: #333;
+    .diagnosisList {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+
+      .diagnosisItem {
+        background-color: #efefef;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        color: #333;
+      }
     }
   }
-}
-.rowContainer {
-  display: flex;
-  // align-items: center;
-  gap: 1rem;
+  .rowContainer {
+    display: flex;
+    // align-items: center;
+    gap: 1rem;
 
-  .columns {
-    width: calc((100% - 2rem) / 3);
+    .columns {
+      width: calc((100% - 2rem) / 3);
+    }
+  }
+  .footer {
+    position: sticky;
+    bottom: 0;
   }
 }
 
 //Diagonstic
 
+// .Diagonsticcontainer {
+//   display: flex;
+//   flex-direction: column;
+//   gap: 1.5rem;
+//   width: 100%;
+
+//   .row {
+//     display: flex;
+//     gap: 1rem;
+//     width: 100%;
+//     margin-bottom: 14px;
+//   }
+
+//   .halfWidth {
+//     width: 50%;
+//     display: flex;
+//     flex-direction: column;
+//     gap: 0.75rem; // spacing between multiple fields inside a column
+//   }
+
+//   .subLabel {
+//     font-size: 14px;
+//     font-weight: 500;
+//     color: #555;
+//     margin-bottom: 0.25rem;
+//   }
+// }
+
+.pageWrapper {
+  display: flex;
+  flex-direction: column;
+  // height: 100vh;
+  // overflow: hidden;
+}
+
+.scrollBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+// Keep your existing form layout
 .Diagonsticcontainer {
   display: flex;
   flex-direction: column;
@@ -108,15 +219,40 @@
     width: 50%;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem; // spacing between multiple fields inside a column
+    gap: 0.75rem;
   }
 
   .subLabel {
     font-size: 14px;
     font-weight: 500;
-    color: #555;
+    color: #414141;
     margin-bottom: 0.25rem;
   }
+}
+
+.footer {
+  background-color: #fff;
+  padding: 1rem;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+}
+
+.formGrid {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.leftColumn {
+  width: 50%;
+}
+
+.rightColumn {
+  width: 50%;
 }
 
 //casenotes
@@ -202,4 +338,37 @@
   justify-content: flex-end;
   gap: 1rem;
   margin-top: 1rem;
+}
+
+//Eligiblity
+
+.EligibleHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+
+  .Eligiblebox {
+    width: 200px;
+  }
+  .EligibleTag {
+    // background-color: #e6f7ff;
+    background: #cfcc1e26;
+    color: #cfa21e;
+
+    // color: #1890ff;
+    font-size: 14px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin: 0;
+  }
+}
+.checkboxContainer {
+  margin-bottom: 15px;
+
+  .Checkboxheader {
+    color: #adadad;
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
 }

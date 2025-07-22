@@ -43,19 +43,20 @@ const splitFormData = (data: CompleteCaseForm) => {
         : null,
     },
     caseDetails: {
-      CCaseManagerId: data.CCaseManager?.id || null,
+      CaseManagerId: data.CaseManager?.id || null,
       Description: data.Description || "",
       CaseName: data.CaseName || "",
       Status: "Pending",
-      CServiceTypeId: data?.CServiceType
-        ? { results: data.CServiceType.map((val: any) => val.value) }
+      ServiceTypeId: data?.ServiceType
+        ? { results: data.ServiceType.map((val: any) => val.value) }
         : null,
     },
     appointment: {
-      ACaseManagerId: data.ACaseManager?.id || null,
-      AServiceTypeId: data?.AServiceType
-        ? { results: data.AServiceType.map((val: any) => val.value) }
-        : null,
+      // ACaseManagerId: data.ACaseManager?.id || null,
+      // AServiceTypeId: data?.AServiceType
+      //   ? { results: data.AServiceType.map((val: any) => val.value) }
+      //   : null,
+      Types: "Appointment",
       CaseNotes: data.CaseNotes,
       BillableType: data?.BillableType?.value || null,
       FromDateTime: new Date(data.FromDateTime) || null,
@@ -159,7 +160,7 @@ export const handleSubmitData = async (formdata: CompleteCaseForm) => {
 
     // 🔹 Add to Appointments
     await SpServices.SPAddItem({
-      Listname: "Appointments",
+      Listname: constants.Listnames.CaseNotes,
       RequestJSON: {
         ...appointment,
         CaseId: caseId,
@@ -308,7 +309,7 @@ export const fetchClientDetails = async (
     Refferal: client.Refferal || null,
     ExistingClient: Existing || null,
     Occupation: client.Occupation || "",
-    ServiceType: client.ServiceType
+    DefaultServiceType: client.ServiceType
       ? client.ServiceType.map((item: any) => ({
           label: item.Title,
           value: item.ID,

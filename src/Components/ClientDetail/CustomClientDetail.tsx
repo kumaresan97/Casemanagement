@@ -127,7 +127,7 @@ const ClientDetailsLayout: React.FC<Props> = ({
 
             <div className={styles.formrow}>
                 <div className={styles.halfwidth}>
-                    <SelectField multiple label="Default service type" options={serviceType} required value={data.ServiceType} onChange={(val) => onChange('ServiceType', val)} disabled={disabled} error={error.ServiceType} />
+                    <SelectField multiple label="Default service type" options={serviceType} required value={data.DefaultServiceType} onChange={(val) => onChange('DefaultServiceType', val)} disabled={disabled} error={error.DefaultServiceType} />
                 </div>
                 <div className={styles.halfwidth}>
                     <InputField label="Client Id number" value={data.ClientIDNumber} onChange={(val) => onChange('ClientIDNumber', val)} disabled={disabled} />

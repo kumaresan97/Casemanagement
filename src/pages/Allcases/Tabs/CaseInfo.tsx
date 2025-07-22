@@ -19,9 +19,12 @@ import DatePickerField from "../../../Components/Formfields/Calendar/CustomCalen
 import { setSelectedCase } from "../../../redux/feauture/dataSlicer";
 import { getAllCases, UpdatecaseInfo } from "../../../Service/AllCases/AllCaseService";
 import { useParams } from "react-router-dom";
-import { cases } from "../../../Types/Type";
+import { cases, SelectOption } from "../../../Types/Type";
 import moment from "moment";
-import { Cases } from "../../../config/constants";
+import { Cases, constants } from "../../../config/constants";
+import { validateStep } from "../../../utils/ValidateStep";
+import CustomButton from "../../../Components/Button/CustomButton";
+import { getServicetype } from "../../../Service/getServicetype";
 
 
 const CaseInfo = () => {
@@ -30,26 +33,62 @@ const CaseInfo = () => {
     const [isEditMode, setIsEditMode] = useState(false);
     const [formData, setFormData] = useState<cases>(Cases)
     const Context = useSelector((state: any) => state.data.value)
+    const [formErrors, setFormErrors] = useState<Partial<Record<keyof cases, string>>>({});
     const selectedCase = useSelector((state: any) => state.data.selectedCase);
+    const [serviceType, setServiceType] = useState<SelectOption[]>([])
 
     const dispatch = useDispatch();
 
     const fetchAndStoreCase = async (id: number) => {
+        const serviceType = await getServicetype(constants.Listnames.ServiceType)
+
         const result = await getAllCases(id);
-        setFormData(result[0])
+        // setFormData(result[0])
         console.log("result: ", result);
+        setServiceType(serviceType)
         if (result?.length > 0) {
             setFormData(result[0])
 
             dispatch?.(setSelectedCase(result[0]));
         }
     };
-    const handleChange = (key: string, value: any) => {
+    const handleChange = <K extends keyof cases>(
+
+        key: K,
+        value: cases[K]
+    ) => {
+        // const handleChange = (key: string, value: any) => {
         setFormData((prev: any) => ({ ...prev, [key]: value }));
+        debugger;
+        setFormErrors((prevErrors) => {
+            const updated = { ...prevErrors };
+            delete updated[key];
+            return updated;
+        });
     };
 
-    const handleSave = () => {
-        UpdatecaseInfo(Number(id), formData)
+
+    const steps = [
+        {
+            title: 'Client Details',
+            component: "",
+            requiredFields: ['CaseName', 'ServiceType', 'CaseManager', 'Description', 'Date'],
+        },]
+
+    const handleSave = async () => {
+        const { valid, fieldErrors } = validateStep(0, steps, formData);
+        console.log("fieldErrors: ", fieldErrors);
+
+
+        if (!valid) {
+            setFormErrors(fieldErrors);
+            return;
+        }
+
+
+        await UpdatecaseInfo(Number(id), formData)
+        dispatch?.(setSelectedCase(formData));
+
         console.log('Saving...', formData);
         // Call API here
         setIsEditMode(false);
@@ -74,8 +113,14 @@ const CaseInfo = () => {
 
 
         <div className={styles.container}>
+
+            <div className={styles.header}>
+                {!isEditMode && (
+                    <Button onClick={() => setIsEditMode(true)}>Edit</Button>
+                )}
+            </div>
             <div className={styles.wrapper}>
-                <div className={styles.leftSection}>
+                <div className={styles.leftSection} style={{ gap: isEditMode ? 0 : 15 }}>
                     <div className={styles.row}>
                         <div className={styles.left}>Case Name</div>
                         <div className={styles.right}>
@@ -83,6 +128,7 @@ const CaseInfo = () => {
                                 <InputField value={formData?.CaseName}
                                     disableWrapper
                                     onChange={(val) => handleChange("CaseName", val)}
+                                    error={formErrors.CaseName}
 
                                 />
                             ) : <span>{formData?.CaseName}</span>}
@@ -97,6 +143,8 @@ const CaseInfo = () => {
                                     value={moment(formData?.Date).format("MM/DD/YYYY")}
                                     disableWrapper
                                     onChange={(val) => handleChange("Date", val)}
+                                    error={formErrors.Date}
+
                                 />
                             ) : (
                                 <span>{formData?.Date || "—"}</span>
@@ -116,6 +164,8 @@ const CaseInfo = () => {
                                         { label: "Non-billable", value: "Non-billable" }
                                     ]}
                                     onChange={(val) => handleChange("BillableType", val)}
+                                    error={formErrors.BillableType}
+
                                 />
                             ) : (
                                 <span>{formData?.BillableType?.value || null}</span>
@@ -124,7 +174,7 @@ const CaseInfo = () => {
                     </div>
                 </div>
 
-                <div className={styles.rightSection}>
+                <div className={styles.rightSection} style={{ gap: isEditMode ? 0 : 15 }}>
                     <div className={styles.row}>
                         <div className={styles.left}>ServiceType</div>
                         <div className={styles.right}>
@@ -132,18 +182,20 @@ const CaseInfo = () => {
                                 <SelectField
                                     disableWrapper
                                     multiple
-                                    value={formData?.CCServiceType}
-                                    onChange={(val) => handleChange("CCServiceType", val)}
-                                    // options={caseData.ServiceType}
-                                    options={[
-                                        { label: "H2025", value: "H2025" },
-                                        { label: "H0043", value: "H0043" },
-                                    ]}
+                                    value={formData?.ServiceType}
+                                    onChange={(val) => handleChange("ServiceType", val)}
+                                    options={serviceType}
+                                    // options={[
+                                    //     { label: "H2025", value: "H2025" },
+                                    //     { label: "H0043", value: "H0043" },
+                                    // ]}
+                                    error={formErrors.ServiceType}
+
                                 />
-                            ) : Array.isArray(formData?.CCServiceType) &&
-                                formData.CCServiceType.length > 0 ? (
+                            ) : Array.isArray(formData?.ServiceType) &&
+                                formData.ServiceType.length > 0 ? (
                                 <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-                                    {formData.CCServiceType.map((s, idx) => (
+                                    {formData.ServiceType.map((s, idx) => (
                                         <Tag
                                             key={idx}
                                             color="gold"
@@ -171,17 +223,19 @@ const CaseInfo = () => {
                             {isEditMode ? (
                                 <PeoplePickerField
 
-                                    defaultUsers={formData.CCaseManager?.email ? [formData.CCaseManager.email] : []}
+                                    defaultUsers={formData.CaseManager?.email ? [formData.CaseManager.email] : []}
                                     context={Context}
-                                    onChange={(val) => handleChange("CCaseManager", val)}
+                                    onChange={(val: any) => handleChange("CaseManager", val[0])}
+                                    error={formErrors.CaseManager}
+
                                 />
                             ) : (
                                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                                     <Avatar
                                         size="small"
-                                        src={`/_layouts/15/userphoto.aspx?size=S&username=${formData?.CCaseManager?.email ?? ""}`}
+                                        src={`/_layouts/15/userphoto.aspx?size=S&username=${formData?.CaseManager?.email ?? ""}`}
                                     />
-                                    <span>{formData?.CCaseManager?.name || "—"}</span>
+                                    <span>{formData?.CaseManager?.name || "—"}</span>
                                 </div>
                             )}
                         </div>
@@ -195,6 +249,8 @@ const CaseInfo = () => {
                                     disableWrapper
                                     value={formData?.Description}
                                     onChange={(val) => handleChange("Description", val)}
+                                    error={formErrors.Description}
+
                                 />
                             ) : (
                                 <span>{formData?.Description || "—"}</span>
@@ -203,18 +259,17 @@ const CaseInfo = () => {
                     </div>
                 </div>
             </div>
-            <div >
-                {isEditMode ? (
-                    <>
-                        <Button type="primary" onClick={handleSave}>
-                            Save
-                        </Button>
-                        <Button onClick={handleCancel}>Cancel</Button>
-                    </>
-                ) : (
-                    <Button onClick={() => setIsEditMode(true)}>Edit</Button>
-                )}
-            </div>
+
+            {isEditMode && (
+                <div className={styles.footer}>
+                    <CustomButton type="primary" label="Save" onClick={handleSave} bgColor="#b78e1a" />
+
+                    <CustomButton label="Cancel" onClick={handleCancel} />
+
+                    {/* <Button onClick={handleCancel}>Cancel</Button> */}
+                </div>
+            )}
+
         </div>
 
 

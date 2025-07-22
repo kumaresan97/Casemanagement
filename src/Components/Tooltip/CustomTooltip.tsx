@@ -22,7 +22,16 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
     const content = isLoading ? (
         <Skeleton active paragraph={false} title={{ width }} />
     ) : (
-        <div style={{ maxWidth: width }}>{title}</div>
+        // <div style={{ maxWidth: width }}>{title}</div>
+        <div
+        // style={{
+        //     maxWidth: width,
+        //     wordBreak: 'break-word',
+        //     whiteSpace: 'normal', // allow multi-line if needed
+        // }}
+        >
+            {title}
+        </div>
     );
 
     return (

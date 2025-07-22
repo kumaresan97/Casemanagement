@@ -45,10 +45,10 @@ const CaseNotesLayout: React.FC<Props> = ({
                         context={context}
                         label="Case manager"
                         required
-                        error={error.CCaseManager}
+                        error={error.CaseManager}
                         disabled={disabled}
-                        defaultUsers={data.CCaseManager?.email ? [data.CCaseManager.email] : []}
-                        onChange={(val: any) => onChange("CCaseManager", val[0])}
+                        defaultUsers={data.CaseManager?.email ? [data.CaseManager.email] : []}
+                        onChange={(val: any) => onChange("CaseManager", val[0])}
                     />
                 </div>
             </div>
@@ -77,10 +77,10 @@ const CaseNotesLayout: React.FC<Props> = ({
                     <SelectField
                         multiple
                         label="Default service type"
-                        value={data.CServiceType}
+                        value={data.ServiceType}
                         options={serviceType}
-                        onChange={(vals) => onChange("CServiceType", vals)}
-                        error={error.CServiceType}
+                        onChange={(vals) => onChange("ServiceType", vals)}
+                        error={error.ServiceType}
                         required
                         disabled={disabled}
                     />

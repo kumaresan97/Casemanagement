@@ -8,8 +8,8 @@ export const fetchCaseDeatils = async () => {
     const caseResponse = await SpServices.SPReadItems({
       Listname: constants.Listnames.CaseDetails,
       Select:
-        "*,CCaseManager/Title,CCaseManager/EMail,CCaseManager/ID,CServiceType/Title,CServiceType/ID,Client/ID,Client/FirstName,Client/LastName,Client/PreferredName",
-      Expand: "CCaseManager,CServiceType,Client",
+        "*,CaseManager/Title,CaseManager/EMail,CaseManager/Id,ServiceType/Title,ServiceType/ID,Client/ID,Client/FirstName,Client/LastName,Client/PreferredName",
+      Expand: "CaseManager,ServiceType,Client",
     });
     const tempCaseDetails: cases[] = caseResponse?.map(
       (val: any): cases => ({
@@ -18,13 +18,13 @@ export const fetchCaseDeatils = async () => {
         CaseName: val.CaseName || "",
         CaseManager: val?.CaseManager
           ? {
-              id: val.CCaseManager.ID || val.CCaseManager.iD,
-              email: val.CCaseManager.EMail || val.CCaseManager.email,
-              name: val.CCaseManager.Title || val.CCaseManager.name,
+              id: val.CaseManager.Id || val.CaseManager.id,
+              email: val.CaseManager.EMail || val.CaseManager.email,
+              name: val.CaseManager.Title || val.CaseManager.name,
             }
           : null,
-        ServiceType: Array.isArray(val.CServiceType)
-          ? val.CServiceType.map((s: any) => ({
+        ServiceType: Array.isArray(val.ServiceType)
+          ? val.ServiceType.map((s: any) => ({
               value: s.ID || s.value,
               label: s.Title || s.label,
             }))
@@ -64,6 +64,11 @@ export const fetchAppointmentDetails = async (
           FilterKey: "Types",
           Operator: "eq",
           FilterValue: "Appointment",
+        },
+        {
+          FilterKey: "IsDeleted",
+          Operator: "ne",
+          FilterValue: 1,
         },
       ],
     });
@@ -110,7 +115,8 @@ export const addNewAppointment = async (
   setMasterAppointments: any,
   setTempAppointments: any,
   currentUserDetails: any,
-  setPopupControl: any
+  setPopupControl: any,
+  setToastMessage: any
 ) => {
   debugger;
   try {
@@ -151,6 +157,11 @@ export const addNewAppointment = async (
         return [...prev, newAppointmentDetails];
       });
       setPopupControl(false);
+      setToastMessage({
+        IsShow: true,
+        Type: "success",
+        Message: "New appointment added successfully!",
+      });
     });
   } catch (err) {
     console.log("Error : ", err);
@@ -160,7 +171,8 @@ export const updateAppointment = async (
   formatData: any,
   setMasterAppointments: any,
   setTempAppointments: any,
-  setPopupControl: any
+  setPopupControl: any,
+  setToastMessage: any
 ) => {
   debugger;
   try {
@@ -209,6 +221,43 @@ export const updateAppointment = async (
         );
       });
       setPopupControl(false);
+      setToastMessage({
+        IsShow: true,
+        Type: "success",
+        Message: "Appointment updated successfully!",
+      });
+    });
+  } catch (err) {
+    console.log("Error : ", err);
+  }
+};
+export const deleteAppointment = async (
+  apptId: number,
+  setMasterAppointments: any,
+  setTempAppointments: any,
+  setPopupControl: any,
+  setApptId: any,
+  setToastMessage: any
+) => {
+  try {
+    await SpServices.SPUpdateItem({
+      Listname: constants.Listnames.CaseNotes,
+      ID: apptId,
+      RequestJSON: { IsDeleted: true },
+    }).then((response) => {
+      setMasterAppointments((prev: any) => {
+        return prev.filter((item: any) => item.Id !== apptId);
+      });
+      setTempAppointments((prev: any) => {
+        return prev.filter((item: any) => item.Id !== apptId);
+      });
+      setPopupControl(false);
+      setApptId(0);
+      setToastMessage({
+        IsShow: true,
+        Type: "success",
+        Message: "Appointment deleted successfully!",
+      });
     });
   } catch (err) {
     console.log("Error : ", err);

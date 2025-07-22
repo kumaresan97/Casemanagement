@@ -15,6 +15,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import EllipsisTag from "../../Components/Tag/Customtag";
 import { Avatar } from "antd";
 import * as moment from "moment";
+import CustomEditor from "../../Components/QuilEditor/CustomQuilEditor";
 
 const BillingInfo: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -307,8 +308,16 @@ const BillingInfo: React.FC = () => {
           </div>
         </div>
         <div className={styles.billable_info_sec_title}>Notes</div>
-        <div className={styles.billable_info_notes}>
-          <p>{billableInfoDetails?.Notes || "—"}</p>
+        <div>
+          {/* <p>{billableInfoDetails?.Notes || "—"}</p>
+           */}
+          <CustomEditor
+            value={billableInfoDetails?.Notes}
+            onChange={(val) => {
+              console.log(val);
+            }}
+            readOnly
+          />
         </div>
         <div className={styles.close_btn}>
           <button type="button" onClick={() => setShowDetails(false)}>

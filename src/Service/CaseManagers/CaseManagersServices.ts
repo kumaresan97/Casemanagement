@@ -8,8 +8,8 @@ export const fetchCaseDetailsbyManagers = async (
   try {
     const tempCaseDetails = await SpServices.SPReadItems({
       Listname: constants.Listnames.CaseDetails,
-      Select: "*,CCaseManager/Title,CCaseManager/EMail,CCaseManager/Id",
-      Expand: "CCaseManager",
+      Select: "*,CaseManager/Title,CaseManager/EMail,CaseManager/Id",
+      Expand: "CaseManager",
       Filter: [
         {
           FilterKey: "Status",
@@ -23,9 +23,9 @@ export const fetchCaseDetailsbyManagers = async (
     } = {};
 
     tempCaseDetails.forEach((caseDetails: any) => {
-      const email = caseDetails?.CCaseManager?.EMail?.toLowerCase();
-      const title = caseDetails?.CCaseManager?.Title;
-      const id = caseDetails?.CCaseManager?.Id;
+      const email = caseDetails?.CaseManager?.EMail?.toLowerCase();
+      const title = caseDetails?.CaseManager?.Title;
+      const id = caseDetails?.CaseManager?.Id;
 
       if (email) {
         if (!managerCounts[email]) {

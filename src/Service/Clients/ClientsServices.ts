@@ -41,6 +41,11 @@ export const fetchClientsDetails = async (
           Id: client.Id,
           FirstName: client.FirstName,
           LastName: client.LastName,
+
+          PreferredName: client.PreferredName,
+          Pronouns: client.Pronouns,
+          Age: client.Age,
+
           Gender: {
             label: client.Gender || "",
             value: client.Gender || "",
@@ -52,11 +57,32 @@ export const fetchClientsDetails = async (
               value: service.Id,
             })) || [],
           ClientID: client.ClientIDNumber || "",
+
+          PreferredLanguage: {
+            label: client.PreferredLanguage || "",
+            value: client.PreferredLanguage || "",
+          },
+          Employment: client?.Employment || "",
+          Income: client?.Income || "",
           HomePhoneNo: client.HomePhone || "",
           MobilePhoneNo: client.MobilePhone || "",
           WorkPhoneNo: client.WorkPhone || "",
           EmailId: client.Email || "",
           Location: client.Location || "",
+          Education: client.Education || "",
+          Occupation: client.Occupation || "",
+          ContactPreference: {
+            label: client.ContactPreference || "",
+            value: client.ContactPreference || "",
+          },
+          ContactDetails: {
+            label: client.ContactDetails || "",
+            value: client.ContactDetails || "",
+          },
+          EmergencyName: client.EName || "",
+          EmergencyPhoneNo: client.EMobilePhone || "",
+          Relationship: client.Relationship || "",
+          EmergencyEmailId: client.EEmail || "",
           Address: client.Address || "",
           City: client.City || "",
           State: client.State || "",
@@ -103,8 +129,16 @@ export const addNewClientDetails = async (
       Status: "Active",
       FirstName: formatData?.FirstName,
       LastName: formatData?.LastName,
+      PreferredName: formatData?.PreferredName,
+      Pronouns: formatData?.Pronouns,
       Gender: formatData?.Gender?.value,
       DateOfBirth: new Date(formatData?.DateOfBirth),
+      Age: formatData?.Age,
+      PreferredLanguage: formatData?.PreferredLanguage?.value,
+      Employment: formatData?.Employment,
+      Education: formatData?.Education,
+      Income: formatData?.Income,
+
       ServiceTypeId: formatData?.ServiceTypes
         ? { results: formatData?.ServiceTypes.map((val: any) => val.value) }
         : null,
@@ -114,9 +148,16 @@ export const addNewClientDetails = async (
       WorkPhone: formatData?.WorkPhoneNo,
       Email: formatData?.EmailId,
       Location: formatData?.Location,
+      ContactPreference: formatData?.ContactPreference?.value,
       Address: formatData?.Address,
       City: formatData?.City,
       State: formatData?.State,
+      EName: formatData?.EmergencyName,
+      EMobilePhone: formatData?.EmergencyPhoneNo,
+      EEmail: formatData?.EmergencyEmailId,
+      ContactDetails: formatData?.ContactDetails?.value,
+      Relationship: formatData?.Relationship,
+      Occupation: formatData?.Occupation,
       HealthInsurance: formatData?.HealthInsurance?.value,
       Refferal: formatData?.Referral?.value,
       MaritalStatus: formatData?.MaritalStatus?.value,
@@ -167,11 +208,18 @@ export const updateClientDetails = async (
   try {
     setLoading(true);
     const payloadJson = {
-      Status: "Active",
       FirstName: formatData?.FirstName,
       LastName: formatData?.LastName,
+      PreferredName: formatData?.PreferredName,
+      Pronouns: formatData?.Pronouns,
       Gender: formatData?.Gender?.value,
       DateOfBirth: new Date(formatData?.DateOfBirth),
+      Age: formatData?.Age,
+      PreferredLanguage: formatData?.PreferredLanguage?.value,
+      Employment: formatData?.Employment,
+      Education: formatData?.Education,
+      Income: formatData?.Income,
+
       ServiceTypeId: formatData?.ServiceTypes
         ? { results: formatData?.ServiceTypes.map((val: any) => val.value) }
         : null,
@@ -181,9 +229,16 @@ export const updateClientDetails = async (
       WorkPhone: formatData?.WorkPhoneNo,
       Email: formatData?.EmailId,
       Location: formatData?.Location,
+      ContactPreference: formatData?.ContactPreference?.value,
       Address: formatData?.Address,
       City: formatData?.City,
       State: formatData?.State,
+      EName: formatData?.EmergencyName,
+      EMobilePhone: formatData?.EmergencyPhoneNo,
+      EEmail: formatData?.EmergencyEmailId,
+      ContactDetails: formatData?.ContactDetails?.value,
+      Relationship: formatData?.Relationship,
+      Occupation: formatData?.Occupation,
       HealthInsurance: formatData?.HealthInsurance?.value,
       Refferal: formatData?.Referral?.value,
       MaritalStatus: formatData?.MaritalStatus?.value,
@@ -212,4 +267,84 @@ export const updateClientDetails = async (
   } catch (err) {
     console.log("Error : ", err);
   }
+};
+
+export const validateClientForm = (formData: any): any => {
+  if (!formData.FirstName) {
+    return {
+      isValid: false,
+      error: { key: "FirstName", errorMessage: "Please enter first name." },
+    };
+  }
+  if (!formData.LastName) {
+    return {
+      isValid: false,
+      error: { key: "LastName", errorMessage: "Please enter last name." },
+    };
+  }
+  if (!formData.PreferredName) {
+    return {
+      isValid: false,
+      error: {
+        key: "PreferredName",
+        errorMessage: "Please enter preferred name.",
+      },
+    };
+  }
+  if (!formData.Age) {
+    return {
+      isValid: false,
+      error: {
+        key: "Age",
+        errorMessage: "Please enter age.",
+      },
+    };
+  }
+  if (formData.ServiceTypes?.length === 0) {
+    return {
+      isValid: false,
+      error: {
+        key: "ServiceTypes",
+        errorMessage: "Please select service type.",
+      },
+    };
+  }
+  if (!formData?.MobilePhoneNo) {
+    return {
+      isValid: false,
+      error: {
+        key: "MobilePhoneNo",
+        errorMessage: "Please enter mobile number.",
+      },
+    };
+  }
+  if (!formData?.EmailId) {
+    return {
+      isValid: false,
+      error: {
+        key: "EmailId",
+        errorMessage: "Please enter email id.",
+      },
+    };
+  }
+  if (!formData?.EmergencyPhoneNo) {
+    return {
+      isValid: false,
+      error: {
+        key: "EmergencyPhoneNo",
+        errorMessage: "Please enter emergencey phone number.",
+      },
+    };
+  }
+  if (!formData?.EmergencyEmailId) {
+    return {
+      isValid: false,
+      error: {
+        key: "EmergencyEmailId",
+        errorMessage: "Please enter emergencey email id.",
+      },
+    };
+  }
+
+  return { isValid: true };
 };

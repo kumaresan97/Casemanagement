@@ -11,6 +11,7 @@ import {
   fetchClientsDetails,
   fetchServiceTypes,
   updateClientDetails,
+  validateClientForm,
 } from "../../Service/Clients/ClientsServices";
 import InputField from "../../Components/Formfields/Textfield/CustomTextfield";
 import DatePickerField from "../../Components/Formfields/Calendar/CustomCalendar";
@@ -24,10 +25,15 @@ import { Button } from "antd";
 import RadioBoxGroup from "../../Components/Formfields/RadioButton/CustomRadioButton";
 import TextAreaField from "../../Components/Formfields/TextArea/CustomTextArea";
 import { IMasterClientDetails, SelectOption } from "../../Types/Type";
+import { getChoiceDropdownOptions } from "../../Service/getChoice";
+import { constants } from "../../config/constants";
 const clientDetails: IMasterClientDetails = {
   Id: 0,
   FirstName: "",
   LastName: "",
+  PreferredName: "",
+  Pronouns: "",
+  Age: "",
   Gender: {
     value: "",
     label: "",
@@ -35,14 +41,34 @@ const clientDetails: IMasterClientDetails = {
   DateOfBirth: "",
   ServiceTypes: [],
   ClientID: "",
+  PreferredLanguage: {
+    value: "",
+    label: "",
+  },
+  Employment: "",
+  Income: "",
   HomePhoneNo: "",
   MobilePhoneNo: "",
   WorkPhoneNo: "",
   EmailId: "",
   Location: "",
+  Education: "",
+  Occupation: "",
+  ContactPreference: {
+    value: "",
+    label: "",
+  },
+  ContactDetails: {
+    value: "",
+    label: "",
+  },
   City: "",
   State: "",
   Address: "",
+  EmergencyName: "",
+  EmergencyPhoneNo: "",
+  Relationship: "",
+  EmergencyEmailId: "",
   HealthInsurance: {
     value: "",
     label: "",
@@ -64,6 +90,13 @@ const clientDetails: IMasterClientDetails = {
 const Clients: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [isClientNewForm, setIsClientNewForm] = useState<string>("");
+  const [responseState, setResponseState] = useState<{
+    key: string;
+    errorMessage: string;
+  }>({
+    key: "",
+    errorMessage: "",
+  });
   const [formData, setFormData] = useState<IMasterClientDetails>(clientDetails);
   const [masterClients, setMasterClients] = useState<IMasterClientDetails[]>(
     []
@@ -72,14 +105,37 @@ const Clients: React.FC = () => {
   const [serviceTypesOptions, setServiceTypesOptions] = useState<
     SelectOption[]
   >([]);
-  const [searchText, setSearchText] = useState<string>("")
+  const [searchText, setSearchText] = useState<string>("");
+  const [getChoiceData, setGetChoiceData] = useState<any>([]);
 
   const onButtonClick = () => {
     setIsClientNewForm("New");
     setFormData(clientDetails);
   };
+  console.log("formData", formData);
+  console.log("masterClients", masterClients);
+  console.log("getChoiceData", getChoiceData);
+
+  const fetchChoices = async () => {
+    const allOptions = await getChoiceDropdownOptions(
+      [
+        "PreferredLanguage",
+        "Refferal",
+        "Religion",
+        "MaritalStatus",
+        "HealthInsurance",
+        "Gender",
+        "ContactPreference",
+        "ContactDetails",
+      ],
+      constants.Listnames.ClientDetails
+    );
+    setGetChoiceData(allOptions);
+    console.log("options: ", allOptions);
+  };
 
   useEffect(() => {
+    fetchChoices();
     fetchServiceTypes(setServiceTypesOptions);
     fetchClientsDetails(setMasterClients, setTempClients, setLoading);
   }, []);
@@ -160,7 +216,7 @@ const Clients: React.FC = () => {
   ];
 
   const handleSearch = (searchText: string) => {
-    setSearchText(searchText)
+    setSearchText(searchText);
     setLoading(true);
     const lowerSearch = searchText.toLowerCase();
     const filteredData = masterClients.filter((item: IMasterClientDetails) => {
@@ -188,23 +244,32 @@ const Clients: React.FC = () => {
   };
 
   const submitClientDetails = () => {
+    const result = validateClientForm(formData);
     debugger;
-    if (isClientNewForm === "New") {
-      addNewClientDetails(
-        formData,
-        setMasterClients,
-        setTempClients,
-        setIsClientNewForm,
-        setLoading
-      );
+    if (result.isValid) {
+      setResponseState({ key: "", errorMessage: "" });
+      if (isClientNewForm === "New") {
+        addNewClientDetails(
+          formData,
+          setMasterClients,
+          setTempClients,
+          setIsClientNewForm,
+          setLoading
+        );
+      } else {
+        updateClientDetails(
+          formData,
+          setMasterClients,
+          setTempClients,
+          setIsClientNewForm,
+          setLoading
+        );
+      }
     } else {
-      updateClientDetails(
-        formData,
-        setMasterClients,
-        setTempClients,
-        setIsClientNewForm,
-        setLoading
-      );
+      setResponseState({
+        key: result.error?.key,
+        errorMessage: result.error?.errorMessage,
+      });
     }
   };
 
@@ -229,12 +294,13 @@ const Clients: React.FC = () => {
   ) : (
     <div className={styles.clients_Container}>
       <PageHeader
-        title={`${isClientNewForm === "New"
-          ? "Create Client"
-          : isClientNewForm === "Edit"
+        title={`${
+          isClientNewForm === "New"
+            ? "Create Client"
+            : isClientNewForm === "Edit"
             ? "Edit Client"
             : "View Client"
-          }`}
+        }`}
         showFilter={false}
         showSearch={false}
         showRefresh={false}
@@ -247,19 +313,77 @@ const Clients: React.FC = () => {
           <div className={styles.client_form_grid}>
             <div className={styles.margin_right}>
               <InputField
-                label="First Name"
-                value={formData?.FirstName}
-                onChange={(val) => handleChange("FirstName", val)}
-                required
+                label="Pronouns"
+                value={formData?.Pronouns}
+                onChange={(val) => handleChange("Pronouns", val)}
                 readOnly={isClientNewForm === "View"}
               />
             </div>
             <div>
               <InputField
+                label="First Name"
+                value={formData?.FirstName}
+                onChange={(val) => handleChange("FirstName", val)}
+                required
+                readOnly={isClientNewForm === "View"}
+                error={
+                  responseState?.key === "FirstName" &&
+                  responseState?.errorMessage
+                    ? responseState?.errorMessage
+                    : ""
+                }
+              />
+            </div>
+            <div className={styles.margin_right}>
+              <InputField
                 label="Last Name"
                 value={formData?.LastName}
                 onChange={(val) => handleChange("LastName", val)}
                 readOnly={isClientNewForm === "View"}
+                required
+                error={
+                  responseState?.key === "LastName" &&
+                  responseState?.errorMessage
+                    ? responseState?.errorMessage
+                    : ""
+                }
+              />
+            </div>
+            <div>
+              <InputField
+                label="Preferred name"
+                value={formData?.PreferredName}
+                onChange={(val) => handleChange("PreferredName", val)}
+                readOnly={isClientNewForm === "View"}
+                required
+                error={
+                  responseState?.key === "PreferredName" &&
+                  responseState?.errorMessage
+                    ? responseState?.errorMessage
+                    : ""
+                }
+              />
+            </div>
+            <div className={styles.margin_right}>
+              <DatePickerField
+                value={formData.DateOfBirth}
+                label="Date of birth"
+                onChange={(val) => handleChange("DateOfBirth", val)}
+                disabled={isClientNewForm === "View"}
+              />
+            </div>
+            <div>
+              <InputField
+                label="Age"
+                value={formData?.Age}
+                onChange={(val) => handleChange("Age", val)}
+                required
+                readOnly={isClientNewForm === "View"}
+                error={
+                  responseState?.key === "Age" && responseState?.errorMessage
+                    ? responseState?.errorMessage
+                    : ""
+                }
               />
             </div>
             <div className={styles.margin_right}>
@@ -275,15 +399,8 @@ const Clients: React.FC = () => {
                 disabled={isClientNewForm === "View"}
               />
             </div>
+
             <div>
-              <DatePickerField
-                value={formData.DateOfBirth}
-                label="Date of birth"
-                onChange={(val) => handleChange("DateOfBirth", val)}
-                disabled={isClientNewForm === "View"}
-              />
-            </div>
-            <div className={styles.margin_right}>
               <SelectField
                 label="Default Service Type"
                 disableWrapper
@@ -294,13 +411,60 @@ const Clients: React.FC = () => {
                 options={serviceTypesOptions}
                 required
                 disabled={isClientNewForm === "View"}
+                error={
+                  responseState?.key === "ServiceTypes" &&
+                  responseState?.errorMessage
+                    ? responseState?.errorMessage
+                    : ""
+                }
               />
             </div>
-            <div>
+            <div className={styles.margin_right}>
               <InputField
                 label="Client ID number"
                 value={formData?.ClientID}
                 onChange={(val) => handleChange("ClientID", val)}
+                readOnly={isClientNewForm === "View"}
+              />
+            </div>
+            <div>
+              <SelectField
+                label="Preferred language"
+                value={formData?.PreferredLanguage}
+                disabled={isClientNewForm === "View"}
+                options={getChoiceData?.PreferredLanguage || []}
+                onChange={(val) => handleChange("PreferredLanguage", val)}
+              />
+            </div>
+            <div className={styles.margin_right}>
+              <InputField
+                label="Employment"
+                value={formData?.Employment}
+                onChange={(val) => handleChange("Employment", val)}
+                readOnly={isClientNewForm === "View"}
+              />
+            </div>
+            <div>
+              <InputField
+                label="Income"
+                value={formData?.Income}
+                onChange={(val) => handleChange("Income", val)}
+                readOnly={isClientNewForm === "View"}
+              />
+            </div>
+            <div className={styles.margin_right}>
+              <InputField
+                label="Education"
+                value={formData?.Education}
+                onChange={(val) => handleChange("Education", val)}
+                readOnly={isClientNewForm === "View"}
+              />
+            </div>
+            <div>
+              <InputField
+                label="Occupation"
+                value={formData?.Occupation}
+                onChange={(val) => handleChange("Occupation", val)}
                 readOnly={isClientNewForm === "View"}
               />
             </div>
@@ -309,7 +473,7 @@ const Clients: React.FC = () => {
           <div className={styles.client_form_grid}>
             <div className={styles.margin_right}>
               <InputField
-                label="Home Phone Number"
+                label="Home Phone"
                 value={formData?.HomePhoneNo}
                 onChange={(val) => handleChange("HomePhoneNo", val)}
                 readOnly={isClientNewForm === "View"}
@@ -317,16 +481,22 @@ const Clients: React.FC = () => {
             </div>
             <div>
               <InputField
-                label="Mobile Phone Number"
+                label="Mobile Phone"
                 value={formData?.MobilePhoneNo}
                 onChange={(val) => handleChange("MobilePhoneNo", val)}
                 readOnly={isClientNewForm === "View"}
                 required
+                error={
+                  responseState?.key === "MobilePhoneNo" &&
+                  responseState?.errorMessage
+                    ? responseState?.errorMessage
+                    : ""
+                }
               />
             </div>
             <div className={styles.margin_right}>
               <InputField
-                label="Work Phone Number"
+                label="Work Phone"
                 value={formData?.WorkPhoneNo}
                 onChange={(val) => handleChange("WorkPhoneNo", val)}
                 readOnly={isClientNewForm === "View"}
@@ -339,6 +509,30 @@ const Clients: React.FC = () => {
                 onChange={(val) => handleChange("EmailId", val)}
                 readOnly={isClientNewForm === "View"}
                 required
+                error={
+                  responseState?.key === "EmailId" &&
+                  responseState?.errorMessage
+                    ? responseState?.errorMessage
+                    : ""
+                }
+              />
+            </div>
+            <div className={styles.margin_right}>
+              <SelectField
+                label="Contact preference"
+                value={formData?.ContactPreference}
+                options={getChoiceData.ContactPreference}
+                disabled={isClientNewForm === "View"}
+                onChange={(val) => handleChange("ContactPreference", val)}
+              />
+            </div>
+            <div>
+              <SelectField
+                label="Contact Details"
+                value={formData?.ContactDetails}
+                options={getChoiceData.ContactDetails}
+                disabled={isClientNewForm === "View"}
+                onChange={(val) => handleChange("ContactDetails", val)}
               />
             </div>
           </div>
@@ -378,6 +572,55 @@ const Clients: React.FC = () => {
               />
             </div>
           </div>
+          <div className={styles.client_form_sec_title}>Emergency Contacts</div>
+          <div className={styles.client_form_grid}>
+            <div className={styles.margin_right}>
+              <InputField
+                label="Name"
+                value={formData?.EmergencyName}
+                onChange={(val) => handleChange("EmergencyName", val)}
+                readOnly={isClientNewForm === "View"}
+              />
+            </div>
+            <div>
+              <InputField
+                label="Mobile phone"
+                value={formData?.EmergencyPhoneNo}
+                onChange={(val) => handleChange("EmergencyPhoneNo", val)}
+                readOnly={isClientNewForm === "View"}
+                required
+                error={
+                  responseState?.key === "EmergencyPhoneNo" &&
+                  responseState?.errorMessage
+                    ? responseState?.errorMessage
+                    : ""
+                }
+              />
+            </div>
+            <div className={styles.margin_right}>
+              <InputField
+                label="Relationship"
+                value={formData?.Relationship}
+                onChange={(val) => handleChange("Relationship", val)}
+                readOnly={isClientNewForm === "View"}
+              />
+            </div>
+            <div>
+              <InputField
+                label="Email"
+                value={formData?.EmergencyEmailId}
+                onChange={(val) => handleChange("EmergencyEmailId", val)}
+                readOnly={isClientNewForm === "View"}
+                required
+                error={
+                  responseState?.key === "EmergencyEmailId" &&
+                  responseState?.errorMessage
+                    ? responseState?.errorMessage
+                    : ""
+                }
+              />
+            </div>
+          </div>
           <div className={styles.client_form_sec_title}>Other Details</div>
           <div className={styles.client_form_grid}>
             <div className={styles.margin_right}>
@@ -408,16 +651,12 @@ const Clients: React.FC = () => {
             </div>
             <div className={styles.margin_right}>
               <SelectField
-                label="Marital status"
+                label="Marital Status"
                 disableWrapper
                 value={formData?.MaritalStatus}
                 onChange={(val) => handleChange("MaritalStatus", val)}
                 //   options={caseData.ServiceType}
-                options={[
-                  { label: "Single", value: "Single" },
-                  { label: "Married", value: "Married" },
-                  { label: "Divorced", value: "Divorced" },
-                ]}
+                options={getChoiceData.MaritalStatus}
                 disabled={isClientNewForm === "View"}
               />
             </div>

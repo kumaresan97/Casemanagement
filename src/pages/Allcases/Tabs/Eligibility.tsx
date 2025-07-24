@@ -530,16 +530,19 @@ const Eligibility = () => {
         const isChanged = selected.Id !== existingIds.eligibilityId;
         const { entryId } = existingIds;
 
-        const payload = {
+        const payload: any = {
             Title: "Eligibility Entry",
-            CaseId: Number(id),
-            EligibilityId: selected.Id,
-            EligibilityCheckPointsId: formData.checkpoints.length
-                ? { results: formData.checkpoints }
-                : null,
+            CaseId: Number(id) || null,
+            EligibilityId: selected.Id || null,
+            // EligibilityCheckPointsId: formData.checkpoints?.length
+            //     ? { results: formData.checkpoints }
+            //     : [],
             Status: formData.status?.value || "",
             Comments: formData.comments || "",
         };
+        if (formData.checkpoints.length) {
+            payload["EligibilityCheckPointsId"] = { results: formData.checkpoints };
+        }
 
         setIsLoading(true);
         try {
@@ -599,7 +602,7 @@ const Eligibility = () => {
                             />
                         </div>
 
-                        <p className={styles.EligibleTag}>{"Eligible"}</p>
+                        <p className={styles.EligibleTag}>{formData.status?.value ?? ""}</p>
 
                     </div>
 

@@ -12,17 +12,19 @@ import { UploadOutlined } from "@ant-design/icons";
 import type { UploadFile } from "antd/es/upload/interface";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { getCaseDocuments, uploadFilesToLibrary } from "../../../Service/AllCases/AllCaseService";
+import { getAllCases, getCaseDocuments, uploadFilesToLibrary } from "../../../Service/AllCases/AllCaseService";
 import CustomButton from "../../../Components/Button/CustomButton";
 import CustomTooltip from "../../../Components/Tooltip/CustomTooltip";
 import { ColumnsType } from "antd/es/table";
 import { ICaseDocument } from "../../../Types/Type";
 import Loader from "../../../Components/Spinner/Loader";
+import { useParams } from "react-router-dom";
 
 
 
-
+let caseFolderName: string
 const Documents = () => {
+    const { id } = useParams();
 
     const selectedCase = useSelector((state: any) => state.data.selectedCase);
 
@@ -33,10 +35,10 @@ const Documents = () => {
     const [documentsData, setDocumentsData] = useState<ICaseDocument[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
-    let caseFolderName = `Case-${selectedCase.Id}-${selectedCase.CaseName}`.replace(
-        /\s+/g,
-        ""
-    );
+    // let caseFolderName = `Case-${selectedCase.Id}-${selectedCase.CaseName}`.replace(
+    //     /\s+/g,
+    //     ""
+    // );
     // const loadDocuments = async () => {
     //     const data = await getCaseDocuments(caseFolderName);
     //     console.log("Documents: ", data);
@@ -72,6 +74,14 @@ const Documents = () => {
     const loadDocuments = async () => {
         setLoading(true);
         try {
+            const folder = await getAllCases(Number(id))
+
+            caseFolderName = `Case-${folder[0].Id}-${folder[0].CaseName}`.replace(
+                /\s+/g,
+                ""
+            );
+
+
             const data = await getCaseDocuments(caseFolderName);
             setDocumentsData(data);
         } catch (error) {

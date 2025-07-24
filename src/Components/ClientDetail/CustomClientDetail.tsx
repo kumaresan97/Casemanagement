@@ -43,11 +43,11 @@ const ClientDetailsLayout: React.FC<Props> = ({
 }) => {
     return (
         <div>
-            <p style={{
+            {/* <p style={{
                 margin: "10px 0px",
                 color: "#cccccc",
                 fontSize: "13px"
-            }}>client name</p>
+            }}>client name</p> */}
 
             <div className={styles.formrow}>
                 <div className={data.ClientType?.value === 'Existing' ? styles.thirdwidth : styles.halfwidth}>
@@ -109,7 +109,7 @@ const ClientDetailsLayout: React.FC<Props> = ({
 
             <div className={styles.formrow}>
                 <div className={styles.halfwidth}>
-                    <InputField label="Preffered name" required value={data.PreferredName} onChange={(val) => onChange('PreferredName', val)} disabled={disabled} error={error.PreferredName} />
+                    <InputField label="Preferred name" required value={data.PreferredName} onChange={(val) => onChange('PreferredName', val)} disabled={disabled} error={error.PreferredName} />
                 </div>
                 <div className={styles.halfwidth}>
                     <SelectField label="Gender" value={data.Gender} options={getChoiceData?.Gender || []} onChange={(val) => onChange('Gender', val)} disabled={disabled} />
@@ -131,6 +131,78 @@ const ClientDetailsLayout: React.FC<Props> = ({
                 </div>
                 <div className={styles.halfwidth}>
                     <InputField label="Client Id number" value={data.ClientIDNumber} onChange={(val) => onChange('ClientIDNumber', val)} disabled={disabled} />
+                </div>
+            </div>
+
+
+
+            <div className={styles.formrow}>
+
+                <div className={styles.halfwidth}>
+                    <SelectField
+                        label="Preferred language"
+                        value={data.PreferredLanguage}
+                        disabled={disabled}
+
+                        options={getChoiceData?.PreferredLanguage || []}
+                        // options={[
+                        //     { label: 'male', value: 'male' },
+                        //     { label: 'female', value: 'female' },
+
+                        // ]}
+                        onChange={(val) => onChange("PreferredLanguage", val)}
+                    />                </div>
+                <div className={styles.halfwidth}>
+                    <InputField label="Employment" value={data.Employment}
+                        onChange={(val) => onChange("Employment", val)}
+                        disabled={disabled}
+
+
+                    />
+                </div>
+            </div>
+            <div className={styles.formrow}>
+
+                <div className={styles.halfwidth}>
+                    <InputField label="Income" value={data.Income}
+                        onChange={(val) => onChange("Income", val)}
+                        disabled={disabled}
+
+
+                    />               </div>
+                <div className={styles.halfwidth}>
+                    <InputField label="Education" value={data.Education}
+                        onChange={(val) => onChange("Education", val)}
+                        disabled={disabled}
+
+
+                    />
+                </div>
+            </div>
+            <div className={styles.formrow}>
+
+                <div className={styles.halfwidth}>
+
+                    <InputField label="Occupation" value={data.Occupation}
+                        onChange={(val) => onChange("Occupation", val)}
+                        disabled={disabled}
+
+
+                    />
+                </div>
+                <div className={styles.halfwidth}>
+                    <SelectField
+                        label="Marital Status"
+                        value={data.MaritalStatus}
+                        disabled={disabled}
+                        options={getChoiceData?.MaritalStatus || []}
+                        // options={[
+                        //     { label: 'male', value: 'male' },
+                        //     { label: 'female', value: 'female' },
+
+                        // ]}
+                        onChange={(val) => onChange("MaritalStatus", val)}
+                    />
                 </div>
             </div>
 
@@ -177,7 +249,7 @@ const ClientDetailsLayout: React.FC<Props> = ({
 
                     <div className={styles.halfwidth}>
                         <SelectField
-                            label="Contact prefference"
+                            label="Contact preference"
                             value={data.ContactPreference}
                             options={getChoiceData.ContactPreference}
                             disabled={disabled}
@@ -318,7 +390,7 @@ const ClientDetailsLayout: React.FC<Props> = ({
                         />                </div>
                     <div className={styles.halfwidth}>
                         <SelectField
-                            label="refferal"
+                            label="referal"
                             value={data.Refferal}
                             options={getChoiceData.Refferal}
                             disabled={disabled}
@@ -333,10 +405,10 @@ const ClientDetailsLayout: React.FC<Props> = ({
 
                     <div className={styles.halfwidth}>
                         <SelectField
-                            label="Maritial Status"
+                            label="Marital Status"
                             value={data.MaritalStatus}
                             disabled={disabled}
-                            options={getChoiceData?.MaritialStatus || []}
+                            options={getChoiceData?.MaritalStatus || []}
                             // options={[
                             //     { label: 'male', value: 'male' },
                             //     { label: 'female', value: 'female' },

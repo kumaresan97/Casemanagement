@@ -98,6 +98,8 @@ const Appointments: React.FC = () => {
   const [popupControl, setPopupControl] = useState<boolean>(false);
   const [delPopupControl, setDelPopupControl] = useState<boolean>(false);
   const [deleteApptId, setDeleteApptId] = useState<number>(0);
+  const [searchText, setSearchText] = useState<string>("")
+
   console.log("masterAppointments", masterAppointments);
   console.log("tempAppointments", tempAppointments);
   console.log("upComingAppointments", upComingAppointments);
@@ -159,7 +161,7 @@ const Appointments: React.FC = () => {
 
   const handleSearch = (searchText: string) => {
     console.log("searchText", searchText);
-
+    setSearchText(searchText)
     const lowerSearch = searchText.toLowerCase();
 
     const filteredData = masterAppointments.filter(
@@ -249,6 +251,12 @@ const Appointments: React.FC = () => {
     const eventStart = moment(selectedEvent?.start);
 
     // Only proceed if the event start is after the current date/time
+
+
+    document.querySelectorAll(".fc-popover-close").forEach((btn: any) => btn.click());
+
+    // Optional: prevent default navigation if it's a link
+    info.jsEvent.preventDefault();
     if (eventStart.isAfter(moment())) {
       setFormData({
         ...formData,
@@ -391,14 +399,16 @@ const Appointments: React.FC = () => {
       />
       <PageHeader
         title="Appointments"
-        showFilter
+        showFilter={false}
         showSearch
-        showRefresh
+        showRefresh={false}
+        searchPlaceholder="Search"
+        searchText={searchText}
         buttonTitle="Add appointment"
         buttonIcon={<PlusCircleOutlined />}
         onSearch={handleSearch}
-        onFilter={() => console.log("Filter clicked")}
-        onRefresh={() => console.log("Refresh clicked")}
+        // onFilter={() => console.log("Filter clicked")}
+        // onRefresh={() => console.log("Refresh clicked")}
         onButtonClick={onButtonClick}
       />
       <div
@@ -551,10 +561,10 @@ const Appointments: React.FC = () => {
                                 ServiceTypes: appt?.ServiceTypes,
                                 CaseManager: appt?.CaseManager
                                   ? {
-                                      id: Number(appt?.CaseManager?.id),
-                                      email: appt?.CaseManager?.email ?? "",
-                                      name: appt?.CaseManager?.name ?? "",
-                                    }
+                                    id: Number(appt?.CaseManager?.id),
+                                    email: appt?.CaseManager?.email ?? "",
+                                    name: appt?.CaseManager?.name ?? "",
+                                  }
                                   : { id: 0, email: "", name: "" },
                                 BillableType: {
                                   value: String(appt?.BillableType?.value),
@@ -689,7 +699,7 @@ const Appointments: React.FC = () => {
                 required
                 error={
                   responseState?.key === "AppointmentSDateTime" &&
-                  responseState?.errorMessage
+                    responseState?.errorMessage
                     ? responseState?.errorMessage
                     : ""
                 }
@@ -709,7 +719,7 @@ const Appointments: React.FC = () => {
                 disabled={formData.AppointmentSDateTime === "" ? true : false}
                 error={
                   responseState?.key === "AppointmentEDateTime" &&
-                  responseState?.errorMessage
+                    responseState?.errorMessage
                     ? responseState?.errorMessage
                     : ""
                 }
@@ -740,7 +750,7 @@ const Appointments: React.FC = () => {
                 required
                 error={
                   responseState?.key === "BillableType" &&
-                  responseState?.errorMessage
+                    responseState?.errorMessage
                     ? responseState?.errorMessage
                     : ""
                 }

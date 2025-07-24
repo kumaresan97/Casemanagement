@@ -225,8 +225,8 @@ const DiagnosticsCode = () => {
     const [diagnosticItems, setdiagnosticItems] = useState<IRiskAssessment>({
         ID: null,
         PresentingProblem: "",
-        ClientIntakeDate: "",
-        DiagnosticsDate: "",
+        ClientIntakeDate: null,
+        DiagnosticsDate: null,
         Observations: "",
         PertinentHistory: "",
         FamilyPsychosocialAssessment: "",
@@ -344,10 +344,10 @@ const DiagnosticsCode = () => {
             setLoading(true);
             if (existingItemId) {
                 await updateRiskAssessment(existingItemId, diagnosticItems);
-                message.success("Risk Assessment updated");
+                message.success("Diagnostic item updated");
             } else {
                 await addRiskAssessment(diagnosticItems, Number(id));
-                message.success("Risk Assessment added");
+                message.success("Diagnostic item added");
             }
             await init();
         } catch (err) {
@@ -424,14 +424,14 @@ const DiagnosticsCode = () => {
                                     </div>
 
                                     <div className={styles.halfWidth}>
-                                        <DatePickerField label="Client intake time" disableWrapper
+                                        <DatePickerField label="Client intake date" disableWrapper
 
-                                            value={diagnosticItems.ClientIntakeDate}
+                                            value={diagnosticItems.ClientIntakeDate ?? null}
                                             onChange={(val) => handleChangeDiagnosticItem("ClientIntakeDate", val)}
 
                                         />
-                                        <DatePickerField label="Diagnostic time" disableWrapper
-                                            value={diagnosticItems.DiagnosticsDate}
+                                        <DatePickerField label="Diagnostics date" disableWrapper
+                                            value={diagnosticItems.DiagnosticsDate ?? null}
                                             onChange={(val) => handleChangeDiagnosticItem("DiagnosticsDate", val)}
                                         />
                                     </div>
@@ -543,10 +543,10 @@ const DiagnosticsCode = () => {
                         <div className={styles.footer}>
                             <CustomButton
                                 type="primary"
-                                label="Save"
+                                label="Submit"
                                 bgColor="#b78e1a"
                                 color="#fff"
-                                borderRadius={10}
+                                borderRadius={4}
                                 onClick={handleDiagnostic}
                             />
                         </div>
@@ -561,6 +561,8 @@ const DiagnosticsCode = () => {
                             onCancel={() => {
                                 setIsEdit(false)
                                 setIsOpen(false)
+                                setFormErrors({})
+
                                 setFormData(initialFormData)
                             }}>
 

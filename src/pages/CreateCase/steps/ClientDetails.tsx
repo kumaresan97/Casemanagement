@@ -32,7 +32,7 @@ const ClientDetails: React.FC<Props> = ({ data, onChange, serviceType, setFormda
     const [existingClients, setExistingClients] = useState<{ label: string; value: string | number }[]>([]);
     // const [selectedClientId, setSelectedClientId] = useState<{ label: string; value: string | number } | any>(null);    // const [serviceType, setServiceType] = useState<any>([])
     const fetchChoices = async () => {
-        const allOptions = await getChoiceDropdownOptions(["PreferredLanguage", "Refferal", "Religion", "MaritalStatus", "HealthInsurance", "Gender", "ContactPreference", "ContactDetails"]);
+        const allOptions = await getChoiceDropdownOptions(["PreferredLanguage", "Refferal", "Religion", "MaritalStatus", "HealthInsurance", "Gender", "ContactPreference", "ContactDetails"], constants.Listnames.ClientDetails);
         // const serviceType = await getServicetype(constants.Listnames.ServiceType)
         // setServiceType(serviceType)
         setGetChoiceData(allOptions);

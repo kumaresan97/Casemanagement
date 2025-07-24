@@ -116,11 +116,12 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable  @typescript-eslint/no-use-before-define */
 
 
 import * as React from 'react';
 import { useState } from 'react';
-import { Steps } from 'antd';
+import { message, Steps } from 'antd';
 import 'antd/dist/antd.css';
 import styles from "./steps/Case.module.scss";
 import ClientDetails from './steps/ClientDetails';
@@ -133,6 +134,7 @@ import { getServicetype } from '../../Service/getServicetype';
 import { validateStep } from '../../utils/ValidateStep';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../../Components/Spinner/Loader';
+import ReusableModal from '../../Components/Modal/CustomModal';
 const activeStepIcon = require('../../assets/png/Rounddot.png');
 const completedStepIcon = require('../../assets/png/Checkmark.png');
 const upcomingIcon = require('../../assets/png/Upcoming.png');
@@ -147,7 +149,10 @@ interface CreateNewCaseProps {
 const CreateNewCase: React.FC<CreateNewCaseProps> = ({ mode, initialData }) => {
     const [currentStep, setCurrentStep] = useState<number>(0);
     const [serviceType, setServiceType] = useState<SelectOption[]>([])
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
+
 
     const [formErrors, setFormErrors] = useState<Partial<Record<keyof CompleteCaseForm, string>>>({});
 
@@ -202,10 +207,7 @@ const CreateNewCase: React.FC<CreateNewCaseProps> = ({ mode, initialData }) => {
         });
     };
 
-
-
     const handleNext = () => {
-        debugger;
         const { valid, fieldErrors } = validateStep(currentStep, steps, formData);
 
         if (!valid) {
@@ -214,8 +216,28 @@ const CreateNewCase: React.FC<CreateNewCaseProps> = ({ mode, initialData }) => {
         }
 
         setFormErrors({});
-        setCurrentStep((prev) => prev + 1);
+
+        // If current step is 1 (index of step 2), show confirmation modal
+        if (currentStep === 1) {
+            setShowConfirmModal(true);
+        } else {
+            setCurrentStep((prev) => prev + 1);
+        }
     };
+
+
+    // const handleNext = () => {
+
+    //     const { valid, fieldErrors } = validateStep(currentStep, steps, formData);
+
+    //     if (!valid) {
+    //         setFormErrors(fieldErrors);
+    //         return;
+    //     }
+
+    //     setFormErrors({});
+    //     setCurrentStep((prev) => prev + 1);
+    // };
 
 
     const handleBack = () => {
@@ -223,6 +245,17 @@ const CreateNewCase: React.FC<CreateNewCaseProps> = ({ mode, initialData }) => {
             setCurrentStep((s) => s - 1);
         }
     };
+
+    const handleModalConfirm = (goToStep3: boolean) => {
+        setShowConfirmModal(false);
+        if (goToStep3) {
+            setCurrentStep((prev) => prev + 1); // go to Appointment step
+        } else {
+            handleSubmit(); // skip to submit
+        }
+    };
+
+
     const handleSubmit = async () => {
         const { valid, fieldErrors } = validateStep(currentStep, steps, formData);
 
@@ -235,34 +268,52 @@ const CreateNewCase: React.FC<CreateNewCaseProps> = ({ mode, initialData }) => {
 
         try {
             if (mode === 'add') {
-                await handleSubmitData(formData);
+                await handleSubmitData(formData, currentStep);
                 setFormData(initialFormData);
+                message.success('Case added successfully!');
             } else {
                 console.log('Updating Case:', formData);
+                message.success('Case updated successfully!');
             }
 
-            setTimeout(() => {
-                // alert('Case submitted successfully!');
-                navigate('/AllCases');
-            }, 1000);
+            navigate('/AllCases');
         } catch (error) {
             console.error('Submit Error:', error);
-            alert('Error while submitting case.');
+            message.error('Something went wrong. Please try again.');
         } finally {
             setLoading(false);
         }
     };
-    // const handleSubmit = async () => {
-    //     // if (!validateStep(currentStep)) return;
 
-    //     if (mode === 'add') {
-    //         await handleSubmitData(formData)
-    //         setFormData(initialFormData)
-    //     } else {
-    //         console.log('Updating Case:', formData);
+    // const handleSubmit = async () => {
+    //     const { valid, fieldErrors } = validateStep(currentStep, steps, formData);
+
+    //     if (!valid) {
+    //         setFormErrors(fieldErrors);
+    //         return;
     //     }
-    //     alert('Case submitted successfully!');
+
+    //     setLoading(true);
+
+    //     try {
+    //         if (mode === 'add') {
+    //             await handleSubmitData(formData);
+    //             setFormData(initialFormData);
+    //         } else {
+    //             console.log('Updating Case:', formData);
+    //         }
+
+    //         setTimeout(() => {
+    //             // alert('Case submitted successfully!');
+    //             navigate('/AllCases');
+    //         }, 1000);
+    //     } catch (error) {
+    //         console.error('Submit Error:', error);
+    //     } finally {
+    //         setLoading(false);
+    //     }
     // };
+
 
     const fetchChoices = async () => {
         const serviceType = await getServicetype(constants.Listnames.ServiceType)
@@ -306,11 +357,10 @@ const CreateNewCase: React.FC<CreateNewCaseProps> = ({ mode, initialData }) => {
                         direction="vertical"
                         current={currentStep}
                         onChange={(clickedStep) => {
-                            // if (clickedStep > currentStep) {
-                            //     const isValid = validateStep(currentStep);
-                            //     if (!isValid) return;
-                            // }
-                            setCurrentStep(clickedStep);
+                            if (clickedStep > currentStep) {
+                                handleNext()
+
+                            }
                         }}
                         items={steps.map((step, index) => {
                             const isCompleted = index < currentStep;
@@ -359,6 +409,33 @@ const CreateNewCase: React.FC<CreateNewCaseProps> = ({ mode, initialData }) => {
                     </div>
                 </div>
             </div>
+
+
+            <>
+
+
+
+
+                <ReusableModal
+                    open={showConfirmModal}
+                    title="Proceed to Appointment?"
+                    onCancel={() => setShowConfirmModal(false)} // "X" button
+                    onCancelClick={() => handleModalConfirm(false)} // Cancel button – "Submit Case"
+                    onOk={() => handleModalConfirm(true)} // "Go to Appointment"
+                    cancelText="Submit"
+                    okText="go to Appointment"
+                    width={400}
+                    padding="16px 24px"
+
+
+
+                >
+                    <p>Would you like to add appointment details before submitting?</p>
+
+                </ReusableModal>
+
+
+            </>
         </div>
     );
 };

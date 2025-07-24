@@ -17,6 +17,8 @@ export const fetchCaseDetailsbyManagers = async (
           FilterValue: "Pending",
         },
       ],
+      Orderby: "Created",
+      Orderbydecorasc: false,
     }).then();
     const managerCounts: {
       [email: string]: { count: number; title: string; id: number };

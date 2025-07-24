@@ -174,7 +174,7 @@ table thead .fc-scroller {
   /* min-height: 10vh;
   max-height: 83vh; */
 }
-.ant-modal-body{
+.ant-modal-body {
   min-height: 10vh;
   max-height: 65vh;
   overflow: auto;
@@ -188,4 +188,8 @@ table thead .fc-scroller {
 
 .ant-picker-now {
   display: none !important;
+}
+
+.fc .fc-popover {
+  z-index: 9999 !important;
 }

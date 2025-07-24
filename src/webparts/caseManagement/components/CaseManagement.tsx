@@ -21,6 +21,9 @@ const CaseManagement = ({ context }: any) => {
   };
   const fetchCurrentUserDetails = async () => {
     await sp.web.currentUser.get().then(async (currentUserDetails) => {
+      console.log("currentUserDetails: ", currentUserDetails);
+
+
       // return {id : currentUserDetails?.Id,name:currentUserDetails?.Title,email:currentUserDetails?.Email}
       dispatch(
         setCurrentUserDetails({

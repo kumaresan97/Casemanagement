@@ -81,6 +81,8 @@
           span {
             color: #030e12;
             font-size: 13px;
+            font-family: "Intermedium", sans-serif;
+            font-weight: 300;
           }
         }
       }
@@ -253,6 +255,18 @@
 
 .rightColumn {
   width: 50%;
+}
+
+.noDiagnosis {
+  color: #888;
+  font-style: italic;
+  padding: 1rem;
+  text-align: center;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80px; // adjust as needed
 }
 
 //casenotes

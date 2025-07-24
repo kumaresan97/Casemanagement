@@ -1,4 +1,7 @@
+/* eslint-disable  @typescript-eslint/no-floating-promises */
+
 import { sp } from "@pnp/sp/presets/all";
+import { message } from "antd";
 import { constants } from "../../config/constants";
 import { CompleteCaseForm, SelectOption } from "../../Types/Type";
 import SpServices from "./SpServices";
@@ -65,13 +68,126 @@ const splitFormData = (data: CompleteCaseForm) => {
   };
 };
 
-export const handleSubmitData = async (formdata: CompleteCaseForm) => {
+// export const handleSubmitData = async (formdata: CompleteCaseForm) => {
+//   const { clientDetails, caseDetails, appointment } = splitFormData(formdata);
+
+//   try {
+//     let clientId: number | any;
+
+//     // 🔹 If existing client, reuse selected client ID
+//     if (
+//       formdata.ClientType?.value === "Existing" &&
+//       formdata.ExistingClient?.value
+//     ) {
+//       clientId =
+//         formdata.ExistingClient?.value != null
+//           ? parseInt(String(formdata.ExistingClient.value))
+//           : null;
+//     } else {
+//       // 🔹 Add new ClientDetails
+//       const clientRes: any = await SpServices.SPAddItem({
+//         Listname: "ClientDetails",
+//         RequestJSON: clientDetails,
+//       });
+//       clientId = clientRes?.data?.ID;
+//     }
+
+//     // 🔹 Add to CaseDetails
+//     const caseRes: any = await SpServices.SPAddItem({
+//       Listname: "CaseDetails",
+//       RequestJSON: {
+//         ...caseDetails,
+//         ClientId: clientId,
+//       },
+//     });
+
+//     const caseId = caseRes?.data?.ID;
+//     const caseFolderName = `Case-${caseId}-${caseDetails.CaseName}`.replace(
+//       /\s+/g,
+//       ""
+//     );
+
+//     // 🔹 Create folder in CaseDocuments
+//     const folderResult = await sp.web
+//       .getFolderByServerRelativeUrl("CaseDocuments")
+//       .folders.add(caseFolderName);
+
+//     // 🔹 Set metadata on the folder itself (optional but fixes missing parent caseId)
+//     const folderItem = await folderResult.folder.listItemAllFields.get();
+//     await sp.web.lists
+//       .getByTitle("CaseDocuments")
+//       .items.getById(folderItem.Id)
+//       .update({
+//         caseId: caseId,
+//         Title: caseFolderName,
+//       });
+
+//     // 🔹 Upload attachments in parallel
+//     const attachments = formdata.attachments;
+//     if (attachments?.length) {
+//       await Promise.all(
+//         attachments.map(async (file) => {
+//           const fileAddResult = await sp.web
+//             .getFolderByServerRelativeUrl(`CaseDocuments/${caseFolderName}`)
+//             .files.add(file.name, file.content, true);
+
+//           const item = await fileAddResult.file.getItem();
+//           await item.update({
+//             caseId: caseId,
+//             Title: file.name,
+//           });
+//         })
+//       );
+//     }
+
+//     // // 🔹 Create folder in CaseDocuments
+//     // await sp.web
+//     //   .getFolderByServerRelativeUrl("CaseDocuments")
+//     //   .folders.add(caseFolderName);
+
+//     // // 🔹 Upload attachments
+//     // const attachments = formdata.attachments;
+//     // if (attachments?.length) {
+//     //   for (const file of attachments) {
+//     //     const fileAddResult = await sp.web
+//     //       .getFolderByServerRelativeUrl(`CaseDocuments/${caseFolderName}`)
+//     //       .files.add(file.name, file.content, true);
+
+//     //     const item = await fileAddResult.file.getItem();
+//     //     await item.update({
+//     //       caseId: caseId,
+//     //       Title: file.name,
+//     //     });
+//     //   }
+//     // }
+
+//     // 🔹 Add to Appointments
+//     await SpServices.SPAddItem({
+//       Listname: constants.Listnames.CaseNotes,
+//       RequestJSON: {
+//         ...appointment,
+//         CaseId: caseId,
+//       },
+//     });
+
+//     // alert("All data and documents submitted successfully!");
+//   } catch (err) {
+//     console.error("Submission Error:", err);
+//     alert("Error occurred while submitting data.");
+//   }
+// };
+
+export const handleSubmitData = async (
+  formdata: CompleteCaseForm,
+  currentStep: number
+) => {
   const { clientDetails, caseDetails, appointment } = splitFormData(formdata);
 
   try {
     let clientId: number | any;
-
-    // 🔹 If existing client, reuse selected client ID
+    debugger;
+    // STEP 2 Logic: Save Client and Case Details
+    // if (currentStep === 1) {
     if (
       formdata.ClientType?.value === "Existing" &&
       formdata.ExistingClient?.value
@@ -81,7 +197,6 @@ export const handleSubmitData = async (formdata: CompleteCaseForm) => {
           ? parseInt(String(formdata.ExistingClient.value))
           : null;
     } else {
-      // 🔹 Add new ClientDetails
       const clientRes: any = await SpServices.SPAddItem({
         Listname: "ClientDetails",
         RequestJSON: clientDetails,
@@ -89,7 +204,6 @@ export const handleSubmitData = async (formdata: CompleteCaseForm) => {
       clientId = clientRes?.data?.ID;
     }
 
-    // 🔹 Add to CaseDetails
     const caseRes: any = await SpServices.SPAddItem({
       Listname: "CaseDetails",
       RequestJSON: {
@@ -104,12 +218,10 @@ export const handleSubmitData = async (formdata: CompleteCaseForm) => {
       ""
     );
 
-    // 🔹 Create folder in CaseDocuments
     const folderResult = await sp.web
       .getFolderByServerRelativeUrl("CaseDocuments")
       .folders.add(caseFolderName);
 
-    // 🔹 Set metadata on the folder itself (optional but fixes missing parent caseId)
     const folderItem = await folderResult.folder.listItemAllFields.get();
     await sp.web.lists
       .getByTitle("CaseDocuments")
@@ -119,11 +231,9 @@ export const handleSubmitData = async (formdata: CompleteCaseForm) => {
         Title: caseFolderName,
       });
 
-    // 🔹 Upload attachments in parallel
-    const attachments = formdata.attachments;
-    if (attachments?.length) {
+    if (formdata.attachments?.length) {
       await Promise.all(
-        attachments.map(async (file) => {
+        formdata.attachments.map(async (file) => {
           const fileAddResult = await sp.web
             .getFolderByServerRelativeUrl(`CaseDocuments/${caseFolderName}`)
             .files.add(file.name, file.content, true);
@@ -137,108 +247,32 @@ export const handleSubmitData = async (formdata: CompleteCaseForm) => {
       );
     }
 
-    // // 🔹 Create folder in CaseDocuments
-    // await sp.web
-    //   .getFolderByServerRelativeUrl("CaseDocuments")
-    //   .folders.add(caseFolderName);
-
-    // // 🔹 Upload attachments
-    // const attachments = formdata.attachments;
-    // if (attachments?.length) {
-    //   for (const file of attachments) {
-    //     const fileAddResult = await sp.web
-    //       .getFolderByServerRelativeUrl(`CaseDocuments/${caseFolderName}`)
-    //       .files.add(file.name, file.content, true);
-
-    //     const item = await fileAddResult.file.getItem();
-    //     await item.update({
-    //       caseId: caseId,
-    //       Title: file.name,
-    //     });
-    //   }
+    // 🔁 Store caseId in localStorage or context to reuse in Step 3
+    localStorage.setItem("currentCaseId", String(caseId));
     // }
 
-    // 🔹 Add to Appointments
-    await SpServices.SPAddItem({
-      Listname: constants.Listnames.CaseNotes,
-      RequestJSON: {
-        ...appointment,
-        CaseId: caseId,
-      },
-    });
+    // STEP 3 Logic: Save Case Notes
+    if (currentStep === 2) {
+      const storedCaseId = localStorage.getItem("currentCaseId");
 
-    // alert("All data and documents submitted successfully!");
+      if (!storedCaseId) {
+        alert("Missing Case ID. Please complete Step 2 first.");
+        return;
+      }
+
+      await SpServices.SPAddItem({
+        Listname: constants.Listnames.CaseNotes,
+        RequestJSON: {
+          ...appointment,
+          CaseId: parseInt(storedCaseId),
+        },
+      });
+    }
   } catch (err) {
     console.error("Submission Error:", err);
-    alert("Error occurred while submitting data.");
+    message.error("Error occurred while submitting data.");
   }
 };
-
-// export const handleSubmitData = async (formdata: CompleteCaseForm) => {
-//   const { clientDetails, caseDetails, appointment } = await splitFormData(
-//     formdata
-//   );
-
-//   try {
-//     // 1. Add to ClientDetails
-//     const clientItem = await sp.web.lists
-//       .getByTitle("ClientDetails")
-//       .items.add({
-//         ...clientDetails,
-//         // ServiceTypeId: {
-//         //   results: clientDetails.ServiceTypeId,
-//         // },
-//       });
-//     const clientId = clientItem.data.ID;
-
-//     // 2. Add to CaseDetails
-//     const caseItem = await sp.web.lists.getByTitle("CaseDetails").items.add({
-//       ...caseDetails,
-//       ClientId: clientId,
-//     });
-
-//     const caseId = caseItem.data.ID;
-//     const caseFolderName = `Case-${caseId}-${caseDetails.CaseName}`.replace(
-//       /\s+/g,
-//       ""
-//     );
-
-//     // 3. Create folder in CaseDocuments
-//     await sp.web
-//       .getFolderByServerRelativeUrl("CaseDocuments")
-//       .folders.add(caseFolderName);
-
-//     // 4. Upload each attachment to the folder and tag with CaseId
-//     const attachments = formdata.attachments;
-
-//     if (attachments && attachments.length > 0) {
-//       for (const file of attachments) {
-//         const fileAddResult = await sp.web
-//           .getFolderByServerRelativeUrl(`CaseDocuments/${caseFolderName}`)
-//           .files.add(file.name, file.content, true); // file.content = Blob/File
-
-//         // Get the associated list item
-//         const item = await fileAddResult.file.getItem();
-
-//         // Update the list item with metadata (caseId)
-//         await item.update({
-//           caseId: caseId, // <-- Make sure 'CaseId' is a valid column name
-//           Title: file.name, // Optional: Set title to file name
-//         });
-//       }
-//     }
-//     // 5. Add to Appointments
-//     await sp.web.lists.getByTitle("Appointments").items.add({
-//       ...appointment,
-//       CaseId: caseId || null,
-//     });
-
-//     alert("All data and documents submitted successfully!");
-//   } catch (err) {
-//     console.error("Submission Error:", err);
-//     alert("Error occurred while submitting data.");
-//   }
-// };
 
 export const fetchExistingClient = async (
   listTitle: string

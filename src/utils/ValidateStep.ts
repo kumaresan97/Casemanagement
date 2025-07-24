@@ -6,7 +6,7 @@ import {
   isValidPeoplePicker,
   isValidFileArray,
   isValidFormat,
-  getTimePart,
+  // getTimePart,
 } from "./validators";
 
 // interface Step {
@@ -74,6 +74,63 @@ interface Step {
   requiredFields: string[];
 }
 
+export const fieldLabels: Record<string, string> = {
+  // Text / Date fields
+  FirstName: "First name",
+  LastName: "Last name",
+  PreferredName: "Preferred name",
+  DateOfBirth: "Date of birth",
+  Age: "Age",
+  ClientIDNumber: "Client ID number",
+  HomePhone: "Home phone",
+  MobilePhone: "Mobile phone",
+  WorkPhone: "Work phone",
+  Email: "Email",
+  Location: "Location",
+  City: "City",
+  Address: "Address",
+  State: "State",
+  EName: "Emergency contact name",
+  EMobilePhone: "Mobile phone",
+  EEmail: "Email",
+  Description: "Description",
+  CaseNotes: "Case notes",
+  FromDateTime: "Start date and time",
+  ToDateTime: "End date and time",
+  Occupation: "Occupation",
+  DefaultServiceType: "Default service type",
+  ServiceType: "Service type",
+  Relationship: "Relationship",
+  ContactDetails: "Contact details",
+  ContactPreference: "Contact preference",
+  Refferal: "Referral source",
+  clientId: "Client ID",
+
+  // AntD Select fields
+  ClientType: "Client type",
+  Pronouns: "Pronouns",
+  Gender: "Gender",
+  PreferredLanguage: "Preferred language",
+  Employment: "Employment",
+  Education: "Education",
+  Income: "Income",
+  MaritalStatus: "Marital status",
+  HealthInsurance: "Health insurance",
+  Religion: "Religion",
+  BillableType: "Billable type",
+
+  // Lookup / others
+  Client: "Client",
+  Case: "Case",
+  attachments: "Attachments",
+  CaseName: "Case name",
+
+  // People picker
+  CaseManager: "Case manager",
+  CaseManagerId: "Case manager",
+  ExistingClient: "Existing client",
+};
+
 export const validateStep = (
   stepIndex: number,
   steps: Step[],
@@ -87,7 +144,8 @@ export const validateStep = (
 
     // Common required field check
     if (!isNonEmpty(value)) {
-      fieldErrors[field] = `${field} is required`;
+      // fieldErrors[field] = `${field} is required`;
+      fieldErrors[field] = `${fieldLabels[field] || field} is required`;
       return;
     }
 
@@ -112,7 +170,8 @@ export const validateStep = (
       ].includes(field) &&
       !isValidSelect(value)
     ) {
-      fieldErrors[field] = `${field} is required`;
+      // fieldErrors[field] = `${field} is required`;
+      fieldErrors[field] = `${fieldLabels[field] || field} is required`;
     }
 
     // People Picker validation
@@ -129,18 +188,21 @@ export const validateStep = (
     if (field === "FromDateTime") {
       if (!isValidFormat(value)) {
         fieldErrors[field] = "Invalid format";
-      } else if (getTimePart(value) === "00:00") {
-        fieldErrors[field] = "Please select a valid time and minutes";
       }
+      //  else if (getTimePart(value) === "00:00") {
+      //   fieldErrors[field] = "Please select a valid time and minutes";
+      // }
     }
 
     // ToDateTime validation
     if (field === "ToDateTime") {
       if (!isValidFormat(value)) {
         fieldErrors[field] = "Invalid format";
-      } else if (getTimePart(value) === "00:00") {
-        fieldErrors[field] = "Please select a valid time and minutes";
       }
+
+      // else if (getTimePart(value) === "00:00") {
+      //   fieldErrors[field] = "Please select a valid time and minutes";
+      // }
 
       // Compare FromDateTime and ToDateTime only if both exist
       if (

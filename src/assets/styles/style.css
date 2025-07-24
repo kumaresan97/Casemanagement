@@ -788,18 +788,25 @@ textarea {
   color: #b78e1a !important;
 }
 
-.ant-btn:hover,
+/* .ant-btn:hover,
 .ant-btn:focus {
   color: inherit !important;
   border-color: transparent !important;
   box-shadow: none !important;
   background: inherit !important;
-}
+} */
 .ant-btn-primary {
   border: none !important;
   color: #fff !important;
   /* background: none !important; */
   box-shadow: none !important;
+}
+.ant-btn-default {
+  border: 1px solid #ccc !important;
+}
+.ant-btn-default:hover {
+  border: 1px solid #ccc !important;
+  color: #000 !important;
 }
 
 .ant-btn-primary:hover,

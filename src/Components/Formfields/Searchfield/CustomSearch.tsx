@@ -23,7 +23,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
         onChange?.(val);     // For local state (if controlled)
-        onSearch?.(val.trim()); // Trigger search immediately
+        onSearch?.(val); // Trigger search immediately
     };
 
     return (

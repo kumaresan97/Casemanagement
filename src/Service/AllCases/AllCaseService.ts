@@ -23,7 +23,7 @@ export const searchFunction = (text: string, data: cases[]): cases[] => {
     [
       item.CaseName,
       item.Description,
-      item.Status,
+      item.Status?.value,
       item.CaseManager?.name,
       item.CaseManager?.email,
       item.Date,
@@ -51,6 +51,8 @@ export const getAllCases = async (id?: number): Promise<cases[]> => {
         "*,CaseManager/Title,CaseManager/EMail,CaseManager/ID,ServiceType/Title,ServiceType/ID,Client/ID",
       Expand: "CaseManager,ServiceType,Client",
       Filter: filters,
+      Orderby: "Created",
+      Orderbydecorasc: false,
     });
 
     const data = res?.map(
@@ -73,8 +75,11 @@ export const getAllCases = async (id?: number): Promise<cases[]> => {
           : [],
         BillableType: { label: "Billable", value: "Billable" },
         ClientId: val.Client?.ID ?? null,
-        Status: val?.Status ?? "",
-        Date: moment(val?.Created).format("MM/DD/YYYY") || "",
+        Status: val?.Status
+          ? { label: val?.Status, value: val?.Status }
+          : { label: "", value: "" },
+        // Date: moment(val?.Created).format("MM/DD/YYYY") || "",
+        Date: moment(val?.Created).format("DD/MM/YYYY") || "",
       })
     );
 
@@ -102,7 +107,9 @@ export const AddCaseNotes = async (
       },
     });
   } catch (err) {
-    alert(err);
+    console.log("err: ", err);
+
+    // alert(err);
   }
 };
 //casenotes
@@ -132,6 +139,8 @@ export const getNotesGroupedByMonth = async (
           FilterValue: caseId,
         },
       ],
+      Orderby: "Created",
+      Orderbydecorasc: false,
       Topcount: 5000,
     });
 
@@ -142,7 +151,7 @@ export const getNotesGroupedByMonth = async (
       if (!createdDate || !item.CaseNotes) return; // skip incomplete items
 
       const monthKey = moment(createdDate).format("MMMM, yyyy");
-      const displayDate = moment(createdDate).format("MMM d, yyyy");
+      const displayDate = createdDate;
 
       const note: CaseNoteItem = {
         type: item.Types || "General",
@@ -253,22 +262,31 @@ export const getCaseDocuments = async (
 
 // case info
 
-export const UpdatecaseInfo = async (id: number, data: cases) => {
+export const UpdatecaseInfo = async (
+  id: number,
+  data: cases,
+  isUpdate: boolean
+) => {
+  const Statusonly = {
+    Status: data,
+  };
   try {
     await SpServices.SPUpdateItem({
       Listname: constants.Listnames.CaseDetails,
       ID: id,
-      RequestJSON: {
-        Title: data.CaseName,
-        CaseManagerId: data.CaseManager?.id,
-        // Date: moment(data.Date) || null,
-        ServiceTypeId: data?.ServiceType
-          ? { results: data.ServiceType.map((val: any) => val.value) }
-          : null,
-        Description: data.Description,
-        ClientId: data.ClientId,
-        Status: "Pending",
-      },
+      RequestJSON: isUpdate
+        ? Statusonly
+        : {
+            Title: data.CaseName,
+            CaseManagerId: data.CaseManager?.id,
+            // Date: moment(data.Date) || null,
+            ServiceTypeId: data?.ServiceType
+              ? { results: data.ServiceType.map((val: any) => val.value) }
+              : null,
+            Description: data.Description,
+            ClientId: data.ClientId,
+            Status: data.Status?.value || null,
+          },
     });
   } catch (err) {
     console.log(err);
@@ -290,6 +308,8 @@ export const getDiagnosticCode = async (id: number) => {
           FilterValue: id,
         },
       ],
+      Orderby: "Created",
+      Orderbydecorasc: false,
     });
     debugger;
 
@@ -352,10 +372,18 @@ export const handleAddDiagnostic = async (
       });
 
       // Add new item to the state
-      setDiagonsticCodes((prev) => [
-        ...prev,
-        { ...formData, ID: response.data.ID || response.data.Id },
-      ]);
+      // setDiagonsticCodes((prev) => [
+      //   ...prev,
+      //   { ...formData, ID: response.data.ID || response.data.Id },
+      // ]);
+
+      setDiagonsticCodes((prev) => {
+        const updated = [
+          ...prev,
+          { ...formData, ID: response.data.ID || response.data.Id },
+        ];
+        return updated.sort((a, b) => b.ID - a.ID);
+      });
     }
 
     setFormData(initialFormData);
@@ -421,6 +449,7 @@ export const getRiskAssessment = async (
           FilterValue: caseId,
         },
       ],
+
       Topcount: 1, // ensure only one item is retrieved
     });
 
@@ -431,8 +460,9 @@ export const getRiskAssessment = async (
     const formatted: IRiskAssessment = {
       ID: item.Id || null,
       PresentingProblem: item.PresentingProblem || "",
-      ClientIntakeDate: item.ClientIntakeDate || "",
-      DiagnosticsDate: item.DiagnosticsDate || "",
+      ClientIntakeDate:
+        moment(item.ClientIntakeDate).format("DD/MM/YYYY") || "",
+      DiagnosticsDate: moment(item.DiagnosticsDate).format("DD/MM/YYYY") || "",
       Observations: item.Observations || "",
       PertinentHistory: item.PertinentHistory || "",
       FamilyPsychosocialAssessment: item.FamilyPsychosocialAssessment || "",
@@ -524,7 +554,7 @@ export const loadDataByCaseId = async (caseId: number) => {
       ID: existing.ID,
       BehavioralDefinition: existing.BehavioralDefinition,
       TreatmentDuration: existing.TreatmentDuration,
-      InitiationDate: existing.InitiationDate,
+      InitiationDate: moment(existing.InitiationDate).format("DD/MM/YYYY"),
       ReferralService: existing.ReferralService,
       AppointmentsFrequency: existing.AppointmentsFrequency,
       TreatmentModality: existing.TreatmentModality ?? [],
@@ -562,7 +592,6 @@ export const updateTreatmentPlan = async (
       ID: id,
       RequestJSON: payload,
     });
-    alert("updated");
     // setisLoading(false);
 
     return result;
@@ -592,7 +621,7 @@ export const addTreatmentPlan = async (
       Listname: "TreatmentPlans",
       RequestJSON: payload,
     });
-    alert("added");
+    // alert("added");
     // setisLoading(false);
     return result;
   } catch (error) {

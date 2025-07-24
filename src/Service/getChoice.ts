@@ -1,14 +1,17 @@
-import { constants } from "../config/constants";
+// import { constants } from "../config/constants";
 import SpServices from "./SPServices/SpServices";
 
 // Type for dropdown option
 type DropdownOption = { label: string; value: string };
 
 // Get raw choice values from SharePoint
-export const getChoiceData = async (Field: string): Promise<string[]> => {
+export const getChoiceData = async (
+  Field: string,
+  Listname: string
+): Promise<string[]> => {
   try {
     const res: any = await SpServices.SPGetChoices({
-      Listname: constants.Listnames.ClientDetails,
+      Listname: Listname,
       FieldName: Field,
     });
     return res?.Choices || [];
@@ -20,19 +23,22 @@ export const getChoiceData = async (Field: string): Promise<string[]> => {
 
 // Function overloads
 export async function getChoiceDropdownOptions(
-  field: string
+  field: string,
+  Listname: string
 ): Promise<DropdownOption[]>;
 export async function getChoiceDropdownOptions(
-  fields: string[]
+  fields: string[],
+  Listname: string
 ): Promise<Record<string, DropdownOption[]>>;
 
 // Unified implementation
 export async function getChoiceDropdownOptions(
-  fields: string | string[]
+  fields: string | string[],
+  Listname: string
 ): Promise<DropdownOption[] | Record<string, DropdownOption[]>> {
   if (typeof fields === "string") {
     try {
-      const choices = await getChoiceData(fields);
+      const choices = await getChoiceData(fields, Listname);
       return choices.map((item) => ({ label: item, value: item }));
     } catch (err) {
       console.error("Error in getChoiceDropdownOptions (single):", err);
@@ -43,7 +49,7 @@ export async function getChoiceDropdownOptions(
     try {
       await Promise.all(
         fields.map(async (field) => {
-          const choices = await getChoiceData(field);
+          const choices = await getChoiceData(field, Listname);
           result[field] = choices.map((item) => ({ label: item, value: item }));
         })
       );

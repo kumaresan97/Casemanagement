@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { getAllCases, searchFunction } from "../../Service/AllCases/AllCaseService";
 import { cases, SelectOption } from "../../Types/Type";
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+// import DeleteIcon from '@mui/icons-material/Delete';
 
 
 import { useNavigate } from 'react-router-dom';
@@ -39,9 +39,9 @@ const AllCases = () => {
         navigate(`/AllCases/${record.Id}`);
     };
 
-    const handleDelete = (record: cases) => {
-        console.log("Delete:", record);
-    };
+    // const handleDelete = (record: cases) => {
+    //     console.log("Delete:", record);
+    // };
 
 
     const columns: ColumnsType<cases> = [
@@ -156,7 +156,7 @@ const AllCases = () => {
                             }}
                         />
                     </CustomTooltip>
-                    <CustomTooltip title="Delete">
+                    {/* <CustomTooltip title="Delete">
                         <DeleteIcon
                             onClick={() => handleDelete(record)}
                             sx={{
@@ -171,7 +171,7 @@ const AllCases = () => {
                                 },
                             }}
                         />
-                    </CustomTooltip>
+                    </CustomTooltip> */}
                 </>
             ),
         }

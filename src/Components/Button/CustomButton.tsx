@@ -12,6 +12,7 @@ interface CustomButtonProps extends ButtonProps {
     style?: React.CSSProperties;
     className?: string;
     type?: "primary" | "default" | "dashed" | "link" | "text";
+    ref?: any;
 }
 
 const CustomButton: React.FC<CustomButtonProps> = ({
@@ -24,7 +25,12 @@ const CustomButton: React.FC<CustomButtonProps> = ({
     style = {},
     className = "",
     type = "default",
+    ref,
+    /// <reference path="" />
+
     ...rest
+    /// <reference path="" />
+
 }) => {
     const buttonStyle: React.CSSProperties = {
         backgroundColor: bgColor,
@@ -36,6 +42,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
 
     return (
         <Button
+            ref={ref}
             icon={icon}
             type={type}
             style={buttonStyle}

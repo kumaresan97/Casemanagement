@@ -2,6 +2,7 @@
 
 import { sp } from "@pnp/sp/presets/all";
 import { message } from "antd";
+import moment from "moment";
 import { constants } from "../../config/constants";
 import { CompleteCaseForm, SelectOption } from "../../Types/Type";
 import SpServices from "./SpServices";
@@ -10,12 +11,13 @@ const splitFormData = (data: CompleteCaseForm) => {
   return {
     clientDetails: {
       ClientType: data.ClientType?.value || "",
-      Pronouns: "",
+      Pronouns: data.Pronouns || "",
       FirstName: data.FirstName || "",
       LastName: data.LastName || "",
       PreferredName: data.PreferredName || "",
       Gender: data?.Gender?.value || "",
-      DateOfBirth: data.DateOfBirth || null,
+      DateOfBirth: moment(data?.DateOfBirth, "DD/MM/YYYY").toDate() || null,
+      // DateOfBirth: new Date(data?.DateOfBirth) || null,
       Age: data.Age || "",
       ClientIDNumber: data.ClientIDNumber,
       PreferredLanguage: data.PreferredLanguage?.value || null,
@@ -36,8 +38,9 @@ const splitFormData = (data: CompleteCaseForm) => {
       EName: data.EName || "",
       EMobilePhone: data.EMobilePhone || "",
       EEmail: data.EEmail || "",
-      Refferal: data.Refferal?.value || null,
+      Refferal: data.Refferal?.value || "",
       Relationship: data.Relationship || "",
+      Occupation: data.Occupation || "",
 
       ContactPreference: data.ContactPreference?.value || null,
       ContactDetails: data.ContactDetails?.value || null,
@@ -309,6 +312,7 @@ export const fetchClientDetails = async (
     .select("*,ServiceType/ID,ServiceType/Title")
     .expand("ServiceType")
     .get();
+  debugger;
 
   const clientDetails = {
     ClientType: { label: "Existing", value: "Existing" },
@@ -316,17 +320,23 @@ export const fetchClientDetails = async (
     FirstName: client.FirstName || "",
     LastName: client.LastName || "",
     PreferredName: client.PreferredName || "",
-    Gender: client?.Gender || "",
-    DateOfBirth: client.DateOfBirth || null,
+    Gender: { lebel: client?.Gender, value: client?.Gender } || "",
+    DateOfBirth: moment(client.DateOfBirth).format("DD/MM/YYYY") || null,
     Age: client.Age || "",
     ClientIDNumber: client.ClientIDNumber || "",
-    PreferredLanguage: client.PreferredLanguage || null,
+    PreferredLanguage:
+      { label: client.PreferredLanguage, value: client.PreferredLanguage } ||
+      null,
     Employment: client?.Employment || "",
     Education: client?.Education || "",
     Income: client?.Income || "",
-    MaritalStatus: client?.MaritalStatus || null,
-    HealthInsurance: client?.HealthInsurance || null,
-    Religion: client?.Religion || null,
+    // MaritalStatus: client?.MaritalStatus || null,
+    MaritalStatus:
+      { label: client?.MaritalStatus, value: client?.MaritalStatus } || null,
+    HealthInsurance:
+      { label: client?.HealthInsurance, value: client?.HealthInsurance } ||
+      null,
+    Religion: { label: client?.Religion, value: client?.Religion } || null,
     HomePhone: client?.HomePhone || "",
     MobilePhone: client?.MobilePhone || "",
     WorkPhone: client?.WorkPhone || "",
@@ -338,10 +348,14 @@ export const fetchClientDetails = async (
     EName: client.EName || "",
     EMobilePhone: client.EMobilePhone || "",
     EEmail: client.EEmail || "",
-    ContactDetails: client.ContactDetails || null,
-    ContactPreference: client.ContactPreference || null,
-    Refferal: client.Refferal || null,
+    ContactDetails:
+      { label: client.ContactDetails, value: client.ContactDetails } || null,
+    ContactPreference:
+      { label: client.ContactPreference, value: client.ContactPreference } ||
+      null,
+    Refferal: { label: client.Refferal, value: client.Refferal } || null,
     ExistingClient: Existing || null,
+    Relationship: client.Relationship || "",
     Occupation: client.Occupation || "",
     DefaultServiceType: client.ServiceType
       ? client.ServiceType.map((item: any) => ({

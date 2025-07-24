@@ -49,6 +49,8 @@ const CaseNotes = () => {
     const { id } = useParams();
     console.log("id: ", id);
     const [loading, setLoading] = useState<boolean>(false);
+    const addButtonRef = useRef<HTMLButtonElement>(null);
+
 
     const [caseNotes, setAllCaseNotes] = useState<GroupedNotes[]>([]);
     const [MastercaseNotes, setMasterCaseNotes] = useState<GroupedNotes[]>([]);
@@ -369,11 +371,22 @@ const CaseNotes = () => {
                 message.error("Failed to fetch case notes");
             } finally {
                 setLoading(false);
+                addButtonRef.current?.focus();
+
             }
         };
 
         loadData();
     }, [id]);
+
+    useEffect(() => {
+        if (!loading) {
+            // Optional timeout helps ensure DOM is ready
+            setTimeout(() => {
+                addButtonRef.current?.focus();
+            }, 0);
+        }
+    }, [loading]);
 
     return loading ? <Loader /> : (
         <div>
@@ -431,27 +444,12 @@ const CaseNotes = () => {
                     </div>
 
 
-                    {/* <RefreshIcon onClick={handleClearFilters} sx={{
-                        width: 22, height: 22
-                    }} /> */}
+
 
 
                 </div>
 
-                {/* 
-                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                    {caseNotes?.map((section, idx) => (
-                        <div key={idx}>
-                            <h5>{section.month}</h5>
 
-                            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                                {section.items.map((item: any, i: number) => (
-                                    <NoteCard key={i} {...item} />
-                                ))}
-                            </div>
-                        </div>
-                    ))}
-                </div> */}
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                     {caseNotes && caseNotes.length > 0 && caseNotes.some(section => section.items.length > 0) ? (
@@ -482,6 +480,8 @@ const CaseNotes = () => {
                     <CustomButton label="Add appointment" type="primary"
                         // loading={loading}
                         // onClick={handleSubmit}
+
+                        ref={addButtonRef}
                         onClick={() => {
                             setIsopen(true)
                         }}
@@ -618,84 +618,13 @@ const CaseNotes = () => {
                                 label="Notes"
                             />
 
-                            {/* <TextAreaField
-                                label="Notes"
-                                value={formData.Notes}
-                                onChange={(val) => handleChange('Notes', val)}
-                                rows={4}
-                                error={formErrors.Notes}
-                                required
-                            /> */}
+
                         </div>
                     </div>
                 </ReusableModal>
 
 
-                {/* <ReusableModal open={isopen} onCancel={() => setIsopen(false)} onOk={handleAddData}>
 
-
-                    <div>
-                        <SelectField
-                            label="Service Types"
-                            multiple
-                            value={formData.ServiceTypes}
-                            options={serviceType}
-                            onChange={(val) => handleChange('ServiceTypes', val)}
-                            error={formErrors.ServiceTypes}
-                            required
-                        />
-
-                        <div >
-                            <CustomCalendarDateTime
-                                label="From date & time"
-                                disableWrapper
-                                value={formData.FromDateTime}
-                                onChange={(val) => handleChange('FromDateTime', val)}
-                                error={formErrors.FromDateTime}
-                                required
-                            />
-                            <CustomCalendarDateTime
-                                label="To date & time"
-                                value={formData.ToDateTime}
-                                onChange={(val) => handleChange('ToDateTime', val)}
-                                error={formErrors.ToDateTime}
-                                required
-                            />
-                        </div>
-
-                        <PeoplePickerField
-                            label="Case Manager"
-                            context={context}
-                            defaultUsers={formData.CaseManager?.email ? [formData.CaseManager.email] : []}
-                            onChange={(val) => handleChange('CaseManager', val[0])}
-                            error={formErrors.CaseManager}
-                            required
-                        />
-
-                        <SelectField
-                            label="Billable Type"
-                            value={formData.BillableType}
-                            options={[
-                                { label: 'Billable', value: 'Billable' },
-                                { label: 'Non-billable', value: 'Non-billable' },
-                            ]}
-                            onChange={(val) => handleChange('BillableType', val)}
-                            error={formErrors.BillableType}
-                            required
-                        />
-
-                        <TextAreaField
-                            label="Notes"
-                            value={formData.Notes}
-                            onChange={(val) => handleChange('Notes', val)}
-                            rows={4}
-                            required
-                        />
-                    </div>
-
-
-
-                </ReusableModal> */}
             </>
         </div>
     )

@@ -84,7 +84,7 @@ export const Cases: cases = {
   },
   ServiceType: [{ label: "", value: "" }],
   ClientId: null,
-  Status: "",
+  Status: { label: "", value: "" },
   Date: "",
   BillableType: { label: "", value: "" },
 };

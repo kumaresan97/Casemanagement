@@ -17,6 +17,8 @@ const CashManagers: React.FC = () => {
   const [tempCMDetails, setTempCMDetails] = useState<ICaseManagersDetails[]>(
     []
   );
+  const [searchText, setSearchText] = useState<string>("")
+
   console.log("masterCMDetails", masterCMDetails);
   console.log("tempCMDetails", tempCMDetails);
 
@@ -26,7 +28,7 @@ const CashManagers: React.FC = () => {
 
   const handleSearch = (searchText: string) => {
     console.log("searchText", searchText);
-
+    setSearchText(searchText)
     const lowerSearch = searchText.toLowerCase();
 
     const filteredData = masterCMDetails.filter(
@@ -49,12 +51,14 @@ const CashManagers: React.FC = () => {
         title="Case Managers"
         showFilter={false}
         showSearch
-        showRefresh
+        showRefresh={false}
+        searchPlaceholder="Search"
+        searchText={searchText}
         buttonTitle=""
         buttonIcon=""
         onSearch={handleSearch}
-        onFilter={() => console.log("Filter clicked")}
-        onRefresh={() => console.log("Refresh clicked")}
+      // onFilter={() => console.log("Filter clicked")}
+      // onRefresh={() => console.log("Refresh clicked")}
       />
       <div className={styles.cardGrid}>
         {tempCMDetails?.map((manager: ICaseManagersDetails) => {
@@ -62,8 +66,8 @@ const CashManagers: React.FC = () => {
             manager.CaseCount > 7
               ? "red"
               : manager.CaseCount > 3
-              ? "yellow"
-              : "green";
+                ? "yellow"
+                : "green";
 
           return (
             <div className={styles.managerCard} key={manager.UserEmail}>
@@ -73,11 +77,11 @@ const CashManagers: React.FC = () => {
                   className={styles.avatar}
                   alt={manager.UserName}
                 />
-                <span
+                {/* <span
                   className={`${styles.statusDot} ${
                     styles[badgeColor as keyof typeof styles]
                   }`}
-                ></span>
+                ></span> */}
               </div>
               <div>
                 <div className={styles.content}>
@@ -85,9 +89,8 @@ const CashManagers: React.FC = () => {
                   <div className={styles.caseText}>
                     Active cases{" "}
                     <span
-                      className={`${styles.caseCount} ${
-                        styles[badgeColor as keyof typeof styles]
-                      }`}
+                      className={`${styles.caseCount} ${styles[badgeColor as keyof typeof styles]
+                        }`}
                     >
                       {String(manager?.CaseCount).padStart(2, "0")}
                     </span>

@@ -12,6 +12,7 @@ import { DiagnosticCode, ITreatmentPlan } from "../../../Types/Type";
 import { useState } from "react";
 import CustomButton from "../../../Components/Button/CustomButton";
 import Loader from "../../../Components/Spinner/Loader";
+import { message } from "antd";
 const TreatmentPlans = () => {
 
     const [diagnoses, setDiagnoses] = useState<DiagnosticCode[]>([])
@@ -22,7 +23,7 @@ const TreatmentPlans = () => {
         ID: null,
         BehavioralDefinition: "",
         TreatmentDuration: "",
-        InitiationDate: "",
+        InitiationDate: null,
         ReferralService: "",
         AppointmentsFrequency: "",
         TreatmentModality: [],
@@ -111,14 +112,24 @@ const TreatmentPlans = () => {
             setIsLoading(true);
 
             if (existingItemId) {
-                await updateTreatmentPlan(existingItemId, formData); // Remove setIsLoading from inside
+                await updateTreatmentPlan(existingItemId, formData);
+                message.success("Treatment plan updated successfully.");
+
+
+                // Remove setIsLoading from inside
             } else {
                 await addTreatmentPlan(formData, Number(id));
+                message.success("Treatment plan added successfully.");
+
             }
 
             await init(); // Refresh after submit
         } catch (error) {
+            message.error("Something went wrong while saving.");
+
             console.error("Submission error:", error);
+            setIsLoading(false);
+
         } finally {
             setIsLoading(false);
         }
@@ -134,7 +145,7 @@ const TreatmentPlans = () => {
 
                 <div className={styles.treatmentPlansWrapper}>
                     {/* Diagnostics Section */}
-                    <div className={styles.diagnosisSection}>
+                    {/* <div className={styles.diagnosisSection}>
                         <label className={styles.sectionLabel}>Diagnostics Impressions</label>
                         <div className={styles.diagnosisList}>
                             {diagnoses.map((diag, index) => (
@@ -143,7 +154,22 @@ const TreatmentPlans = () => {
                                 </div>
                             ))}
                         </div>
+                    </div> */}
+                    <div className={styles.diagnosisSection}>
+                        <label className={styles.sectionLabel}>Diagnostic Impressions</label>
+                        <div className={styles.diagnosisList}>
+                            {diagnoses.length > 0 ? (
+                                diagnoses.map((diag, index) => (
+                                    <div key={index} className={styles.diagnosisItem}>
+                                        {diag?.DCode}
+                                    </div>
+                                ))
+                            ) : (
+                                <div className={styles.noDiagnosis}>No Diagnostic Code found</div>
+                            )}
+                        </div>
                     </div>
+
 
                     <div className={styles.rowContainer}>
 

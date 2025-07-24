@@ -30,6 +30,8 @@ export const fetchClientsDetails = async (
       Listname: constants.Listnames.ClientDetails,
       Select: "*,ServiceType/Id,ServiceType/Title",
       Expand: "ServiceType",
+      Orderby: "Created",
+      Orderbydecorasc: false,
     });
     console.log("clientsResponse", clientsResponse);
 
@@ -131,12 +133,22 @@ export const addNewClientDetails = async (
         Id: res.data?.Id,
         Status: "Active",
       };
+
       setMasterClients((prev: any) => {
-        return [...prev, newAppointmentDetails];
+        const updated = [...prev, newAppointmentDetails];
+        return updated.sort((a, b) => b.Id - a.Id); // sort by Id DESC
       });
+
       setTempClients((prev: any) => {
-        return [...prev, newAppointmentDetails];
+        const updated = [...prev, newAppointmentDetails];
+        return updated.sort((a, b) => b.Id - a.Id); // sort by Id DESC
       });
+      // setMasterClients((prev: any) => {
+      //   return [...prev, newAppointmentDetails];
+      // });
+      // setTempClients((prev: any) => {
+      //   return [...prev, newAppointmentDetails];
+      // });
       setPopupControl("");
       setLoading(false);
     });

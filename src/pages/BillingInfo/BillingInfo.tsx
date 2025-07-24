@@ -26,6 +26,8 @@ const BillingInfo: React.FC = () => {
   const [tempBIDetails, setBIDetails] = useState<IBillableInfoDetails[]>([]);
   const [billableInfoDetails, setBillableInfoDetails] =
     useState<IBillableInfoDetails>({} as IBillableInfoDetails);
+  const [selectDate, setSelectDate] = useState<string | null>(null)
+  const [searchText, setSearchText] = React.useState('');
 
   console.log("masterBIDetails", masterBIDetails);
   console.log("tempBIDetails", tempBIDetails);
@@ -123,61 +125,103 @@ const BillingInfo: React.FC = () => {
     },
   ];
 
+  const handleSearch = (searchText: string, selectedDate?: string | null) => {
+    const lowerSearch = searchText.toLowerCase();
+    const dateToMatch = selectedDate?.trim();
+    debugger;
+
+    const filteredData = masterBIDetails.filter((item: IBillableInfoDetails) => {
+      const matchCaseLabel = item?.Case?.label?.toLowerCase()?.includes(lowerSearch);
+      const matchClientFirst = item?.ClientDetails?.firstName?.toLowerCase()?.includes(lowerSearch);
+      const matchClientLast = item?.ClientDetails?.lastName?.toLowerCase()?.includes(lowerSearch);
+      const matchCreatedAt = item?.CreatedAt?.toLowerCase()?.includes(lowerSearch);
+      const matchAppointment = (item?.Type === "Appointment" ? "yes" : "no")?.includes(lowerSearch);
+
+      // Search text matching
+      const matchSearchText =
+        matchCaseLabel || matchClientFirst || matchClientLast || matchCreatedAt || matchAppointment;
+
+      // Date matching (assumes item.CreatedAt is in 'DD/MM/YYYY' format)
+      const matchDate =
+        !dateToMatch || item?.CreatedAt?.startsWith(dateToMatch); // basic startsWith for date string match
+
+      return matchSearchText && matchDate;
+    });
+
+    setBIDetails(filteredData);
+  };
+  const onSearchTextChange = (val: string) => {
+    setSearchText(val)
+    handleSearch(val, selectDate);
+  };
+
+  const onDateChange = (val: string) => {
+    setSelectDate(val);
+    handleSearch(searchText, val);
+  };
+
+
   useEffect(() => {
     fetchBillableDetails(setMasterBIDetails, setBIDetails);
     setLoading(false);
   }, []);
 
-  const handleSearch = (searchText: string) => {
-    console.log("searchText", searchText);
+  // const handleSearch = (searchText: string) => {
+  //   console.log("searchText", searchText);
 
-    const lowerSearch = searchText.toLowerCase();
+  //   const lowerSearch = searchText.toLowerCase();
 
-    const filteredData = masterBIDetails.filter(
-      (item: IBillableInfoDetails) => {
-        const matchCaseLabel = item?.Case?.label
-          ?.toLowerCase()
-          ?.includes(lowerSearch);
-        const matchClientFirst = item?.ClientDetails?.firstName
-          ?.toLowerCase()
-          ?.includes(lowerSearch);
-        const matchClientLast = item?.ClientDetails?.lastName
-          ?.toLowerCase()
-          ?.includes(lowerSearch);
-        const matchCreatedAt =
-          item?.CreatedAt?.toLowerCase()?.includes(lowerSearch);
-        // const matchBillable = item?.BillableType?.label
-        //   ?.toLowerCase()
-        //   ?.includes(lowerSearch);
-        const matchAppointment = (
-          item?.Type === "Appointment" ? "yes" : "no"
-        ).includes(lowerSearch);
+  //   const filteredData = masterBIDetails.filter(
+  //     (item: IBillableInfoDetails) => {
+  //       const matchCaseLabel = item?.Case?.label
+  //         ?.toLowerCase()
+  //         ?.includes(lowerSearch);
+  //       const matchClientFirst = item?.ClientDetails?.firstName
+  //         ?.toLowerCase()
+  //         ?.includes(lowerSearch);
+  //       const matchClientLast = item?.ClientDetails?.lastName
+  //         ?.toLowerCase()
+  //         ?.includes(lowerSearch);
+  //       const matchCreatedAt =
+  //         item?.CreatedAt?.toLowerCase()?.includes(lowerSearch);
+  //       // const matchBillable = item?.BillableType?.label
+  //       //   ?.toLowerCase()
+  //       //   ?.includes(lowerSearch);
+  //       const matchAppointment = (
+  //         item?.Type === "Appointment" ? "yes" : "no"
+  //       ).includes(lowerSearch);
 
-        return (
-          matchCaseLabel ||
-          matchClientFirst ||
-          matchClientLast ||
-          matchCreatedAt ||
-          // matchBillable ||
-          matchAppointment
-        );
-      }
-    );
-    setBIDetails(filteredData);
-  };
+  //       return (
+  //         matchCaseLabel ||
+  //         matchClientFirst ||
+  //         matchClientLast ||
+  //         matchCreatedAt ||
+  //         // matchBillable ||
+  //         matchAppointment
+  //       );
+  //     }
+  //   );
+  //   setBIDetails(filteredData);
+  // };
 
   return !showDetails ? (
     <div className={styles.billing_info_Container}>
       <PageHeader
         title="Billing Info"
-        showFilter
+        showFilter={false}
         showSearch
         showRefresh
         buttonTitle=""
         buttonIcon=""
-        onSearch={handleSearch}
-        onFilter={() => console.log("Filter clicked")}
-        onRefresh={() => console.log("Refresh clicked")}
+        // onSearch={handleSearch}
+        searchText={searchText}
+        onSearch={onSearchTextChange}
+        // onFilter={() => console.log("Filter clicked")}
+        // onRefresh={() => console.log("Refresh clicked")}
+
+        showCalendar
+        calendarValue={selectDate}
+        onDateChange={onDateChange}
       />
       <CommonTable<IBillableInfoDetails>
         columns={columns}
@@ -214,16 +258,15 @@ const BillingInfo: React.FC = () => {
           </div>
           <div>
             <p className={styles.billable_info_label}>Current Status</p>
-            <EllipsisTag label={billableInfoDetails?.CaseStatus} />
+            <EllipsisTag label={billableInfoDetails?.CaseStatus ?? null} />
           </div>
           <div>
             <p className={styles.billable_info_label}>Case Manager</p>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <Avatar
                 size="small"
-                src={`/_layouts/15/userphoto.aspx?size=S&username=${
-                  billableInfoDetails?.CaseManager?.email ?? ""
-                }`}
+                src={`/_layouts/15/userphoto.aspx?size=S&username=${billableInfoDetails?.CaseManager?.email ?? ""
+                  }`}
               />
               <CustomTooltip
                 title={billableInfoDetails?.CaseManager?.name ?? ""}
@@ -279,9 +322,8 @@ const BillingInfo: React.FC = () => {
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <Avatar
                 size="small"
-                src={`/_layouts/15/userphoto.aspx?size=S&username=${
-                  billableInfoDetails?.CreadedBy?.email ?? ""
-                }`}
+                src={`/_layouts/15/userphoto.aspx?size=S&username=${billableInfoDetails?.CreadedBy?.email ?? ""
+                  }`}
               />
               <CustomTooltip
                 title={billableInfoDetails?.CreadedBy?.name ?? ""}

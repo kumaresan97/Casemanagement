@@ -89,8 +89,8 @@ export interface cases {
   CaseManager: PeoplePickerUser | null;
   ServiceType: SelectOption[] | null;
   ClientId?: number | null;
-  Status?: string;
-  Date?: string | Date;
+  Status?: SelectOption | null;
+  Date?: string | Date | any;
   ClientDetails?: any;
   BillableType?: SelectOption | null;
 }
@@ -101,7 +101,7 @@ interface AttachmentFile {
 
 export interface CaseNoteItem {
   type: string;
-  date: string;
+  date: string | Date;
   content: string;
   billable: boolean;
 }
@@ -137,7 +137,7 @@ export interface IClientDetails {
 }
 export interface IBillableInfoDetails {
   Id: number;
-  Case: SelectOption;
+  Case: SelectOption | null;
   AppointmentSDateTime: string;
   AppointmentEDateTime: string;
   CreadedBy: PeoplePickerUser | null;
@@ -148,7 +148,7 @@ export interface IBillableInfoDetails {
   Type: string;
   ClientDetails: IClientDetails;
   CreatedAt: string;
-  CaseStatus: string;
+  CaseStatus: string | SelectOption | any;
 }
 export interface IAppointmentDetails {
   Id: number;
@@ -196,7 +196,7 @@ export interface ITreatmentPlan {
   ID: number | null;
   BehavioralDefinition: string;
   TreatmentDuration: string;
-  InitiationDate: string;
+  InitiationDate: string | null;
   ReferralService: string;
   AppointmentsFrequency: string;
   TreatmentModality: string[];
@@ -206,8 +206,8 @@ export interface ITreatmentPlan {
 export interface IRiskAssessment {
   ID?: number | null;
   PresentingProblem: string;
-  ClientIntakeDate: string; // ISO or string
-  DiagnosticsDate: string;
+  ClientIntakeDate: string | null | Date; // ISO or string
+  DiagnosticsDate: string | null | Date;
   Observations: string;
   PertinentHistory: string;
   FamilyPsychosocialAssessment: string;

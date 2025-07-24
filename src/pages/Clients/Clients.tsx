@@ -72,6 +72,7 @@ const Clients: React.FC = () => {
   const [serviceTypesOptions, setServiceTypesOptions] = useState<
     SelectOption[]
   >([]);
+  const [searchText, setSearchText] = useState<string>("")
 
   const onButtonClick = () => {
     setIsClientNewForm("New");
@@ -159,6 +160,7 @@ const Clients: React.FC = () => {
   ];
 
   const handleSearch = (searchText: string) => {
+    setSearchText(searchText)
     setLoading(true);
     const lowerSearch = searchText.toLowerCase();
     const filteredData = masterClients.filter((item: IMasterClientDetails) => {
@@ -210,14 +212,16 @@ const Clients: React.FC = () => {
     <div className={styles.clients_Container}>
       <PageHeader
         title="Clients"
-        showFilter
+        showFilter={false}
         showSearch
-        showRefresh
+        showRefresh={false}
         buttonTitle="Create Client"
         buttonIcon={<PlusCircleOutlined />}
         onSearch={handleSearch}
-        onFilter={() => console.log("Filter clicked")}
-        onRefresh={() => console.log("Refresh clicked")}
+        searchText={searchText}
+        searchPlaceholder="Search"
+        // onFilter={() => console.log("Filter clicked")}
+        // onRefresh={() => console.log("Refresh clicked")}
         onButtonClick={onButtonClick}
       />
       <CommonTable columns={column} data={tempClients} loading={loading} />
@@ -225,13 +229,12 @@ const Clients: React.FC = () => {
   ) : (
     <div className={styles.clients_Container}>
       <PageHeader
-        title={`${
-          isClientNewForm === "New"
-            ? "Create Client"
-            : isClientNewForm === "Edit"
+        title={`${isClientNewForm === "New"
+          ? "Create Client"
+          : isClientNewForm === "Edit"
             ? "Edit Client"
             : "View Client"
-        }`}
+          }`}
         showFilter={false}
         showSearch={false}
         showRefresh={false}
@@ -267,6 +270,7 @@ const Clients: React.FC = () => {
                 options={[
                   { label: "Male", value: "Male" },
                   { label: "Female", value: "Female" },
+                  { label: "others", value: "others" },
                 ]}
                 disabled={isClientNewForm === "View"}
               />

@@ -17,6 +17,8 @@ export const fetchBillableDetails = async (
       //   Expand: "ACaseManager,Case,AServiceType,Author",
       Select: "*,Case/Id,Case/CaseName,Author/Title,Author/EMail,Author/Id",
       Expand: "Case,Author",
+      Orderby: "Created",
+      Orderbydecorasc: false,
     });
     console.log("tempAppointmentsDetails", tempAppointmentsDetails);
     const bindAppointmentDetails: IBillableInfoDetails[] =

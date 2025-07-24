@@ -5,12 +5,18 @@
 import * as React from 'react';
 import styles from "./Headerstyle.module.scss";
 const Logo = require("../../assets/png/Logo.png")
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+// import NotificationsIcon from '@mui/icons-material/Notifications';
+// import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { useSelector } from 'react-redux';
 
 
 const Topbar: React.FC = () => {
-    return (
+
+
+    const currentUserDetails = useSelector(
+        (state: any) => state?.data?.currentUserDetails
+    );
+    console.log("currentUserDetails", currentUserDetails); return (
         // <div className={styles.topbar}>
         //     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         //         <img src={Logo} alt="Logo" style={{ width: "40px", height: "40px" }} />
@@ -28,7 +34,7 @@ const Topbar: React.FC = () => {
                 <h2 className={styles.title}>Mysti's cares</h2>
             </div>
 
-            <div className={styles.right}>
+            {/* <div className={styles.right}>
                 <div className={styles.notification}>
                     <NotificationsIcon />
                     <span className={styles.dot} />
@@ -46,7 +52,7 @@ const Topbar: React.FC = () => {
                     />
                     <KeyboardArrowDownIcon />
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 };

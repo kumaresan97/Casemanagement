@@ -10,7 +10,7 @@ interface EllipsisTagProps extends TagProps {
 }
 
 const getTagStyle = (label: string): React.CSSProperties => {
-    const lower = label.toLowerCase();
+    const lower = label?.toLowerCase();
 
     if (lower.includes('pending')) {
         return { background: '#f7f0dc', color: '##584206' }; // orange

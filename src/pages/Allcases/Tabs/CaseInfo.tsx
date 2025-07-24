@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import styles from "../Case.module.scss"
 import InputField from "../../../Components/Formfields/Textfield/CustomTextfield";
 import SelectField from "../../../Components/Formfields/Dropdown/CustomDropdown";
-import { Avatar, Button, message, Tag, } from "antd";
+import { Avatar, message, Tag, } from "antd";
 import PeoplePickerField from "../../../Components/Formfields/PeoplePicker/CustomPeoplePicker";
 // import { useSelector } from "react-redux";
 import TextAreaField from "../../../Components/Formfields/TextArea/CustomTextArea";
@@ -20,7 +20,6 @@ import { setSelectedCase } from "../../../redux/feauture/dataSlicer";
 import { getAllCases, UpdatecaseInfo } from "../../../Service/AllCases/AllCaseService";
 import { useParams } from "react-router-dom";
 import { cases, SelectOption } from "../../../Types/Type";
-import moment from "moment";
 import { Cases, constants } from "../../../config/constants";
 import { validateStep } from "../../../utils/ValidateStep";
 import CustomButton from "../../../Components/Button/CustomButton";
@@ -164,7 +163,7 @@ const CaseInfo = () => {
 
         try {
             setLoading(true);
-            await UpdatecaseInfo(Number(id), formData);
+            await UpdatecaseInfo(Number(id), formData, false);
             dispatch?.(setSelectedCase(formData));
             message.success("Case updated successfully"); // ✅ Show success message
 
@@ -202,7 +201,8 @@ const CaseInfo = () => {
 
                     <div className={styles.header}>
                         {!isEditMode && (
-                            <Button onClick={() => setIsEditMode(true)}>Edit</Button>
+                            <CustomButton label="Edit" onClick={() => setIsEditMode(true)} type="default" />
+                            // <Button onClick={() => setIsEditMode(true)}>Edit</Button>
                         )}
                     </div>
                     <div className={styles.wrapper}>
@@ -226,7 +226,7 @@ const CaseInfo = () => {
                                     {isEditMode ? (
                                         <DatePickerField
                                             label=""
-                                            value={moment(formData?.Date).format("MM/DD/YYYY")}
+                                            value={formData?.Date ?? null}
                                             disableWrapper
                                             onChange={(val) => handleChange("Date", val)}
                                             error={formErrors.Date}
@@ -348,7 +348,7 @@ const CaseInfo = () => {
 
                     {isEditMode && (
                         <div className={styles.footer}>
-                            <CustomButton type="primary" label="Save" onClick={handleSave} bgColor="#b78e1a" />
+                            <CustomButton type="primary" label="Submit" onClick={handleSave} bgColor="#b78e1a" />
 
                             <CustomButton label="Cancel" onClick={handleCancel} />
 

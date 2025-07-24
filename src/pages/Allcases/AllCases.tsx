@@ -28,6 +28,7 @@ const AllCases = () => {
     const [masterData, setMasterData] = useState<cases[]>([])
     const [allCase, setAllCase] = useState<cases[]>([])
     const [loading, setLoading] = useState<boolean>(true);
+    const [searchText, setSearchText] = useState<string>("")
 
     const navigate = useNavigate();
     // const [searh, setSearch] = useState<string>("")
@@ -70,7 +71,7 @@ const AllCases = () => {
                         }}
                     >
                         {types.map((t) => (
-                            <EllipsisTag key={t.value} label={t.label} />
+                            <EllipsisTag key={t?.value} label={t?.label} />
                         ))}
                     </div>
                 ) : (
@@ -115,10 +116,11 @@ const AllCases = () => {
             key: "Status",
             width: 200,
             ellipsis: true,
-            render: (Status: string) => {
+            render: (Status: any) => {
+                debugger;
                 return (
                     <div style={{ display: "flex", alignItems: "center" }}>
-                        <EllipsisTag label={Status} style={{
+                        <EllipsisTag label={Status?.value} style={{
                             borderRadius: "20px",
                             textAlign: "center",
                             border: "none"
@@ -178,12 +180,11 @@ const AllCases = () => {
 
     const handleSearch = (text: string) => {
         console.log(text, "text");
-        debugger
+        setSearchText(text)
 
         const filtered = text
             ? searchFunction(text, masterData)
             : masterData; // reset to full list if cleared
-
         setAllCase(filtered);
     };
 
@@ -218,16 +219,17 @@ const AllCases = () => {
 
             <PageHeader
                 title="All Cases"
-                showFilter
+                showFilter={false}
                 showSearch
-                showRefresh
+                showRefresh={false}
                 buttonTitle="Create case"
                 buttonIcon={<PlusCircleOutlined />}
                 onSearch={handleSearch}
                 searchPlaceholder="Search"
-                onFilter={() => console.log('Filter clicked')}
+                searchText={searchText}
+                // onFilter={() => console.log('Filter clicked')}
 
-                onRefresh={() => console.log('Refresh clicked')}
+                // onRefresh={() => console.log('Refresh clicked')}
                 onButtonClick={() =>
                     navigate("/cases/new")
                 }

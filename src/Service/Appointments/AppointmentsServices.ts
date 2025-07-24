@@ -10,6 +10,8 @@ export const fetchCaseDeatils = async () => {
       Select:
         "*,CaseManager/Title,CaseManager/EMail,CaseManager/Id,ServiceType/Title,ServiceType/ID,Client/ID,Client/FirstName,Client/LastName,Client/PreferredName",
       Expand: "CaseManager,ServiceType,Client",
+      Orderby: "Created",
+      Orderbydecorasc: false,
     });
     const tempCaseDetails: cases[] = caseResponse?.map(
       (val: any): cases => ({
@@ -71,6 +73,8 @@ export const fetchAppointmentDetails = async (
           FilterValue: 1,
         },
       ],
+      Orderby: "Created",
+      Orderbydecorasc: false,
     });
     console.log("tempAppointmentsDetails", tempAppointmentsDetails);
     const bindAppointmentDetails = tempAppointmentsDetails.map(
@@ -150,12 +154,22 @@ export const addNewAppointment = async (
         BillableType: formatData?.BillableType,
         Notes: formatData?.Notes || "",
       };
+
       setMasterAppointments((prev: any) => {
-        return [...prev, newAppointmentDetails];
+        const updated = [...prev, newAppointmentDetails];
+        return updated.sort((a, b) => b.Id - a.Id); // sort by Id DESC
       });
+
       setTempAppointments((prev: any) => {
-        return [...prev, newAppointmentDetails];
+        const updated = [...prev, newAppointmentDetails];
+        return updated.sort((a, b) => b.Id - a.Id); // sort by Id DESC
       });
+      // setMasterAppointments((prev: any) => {
+      //   return [...prev, newAppointmentDetails];
+      // });
+      // setTempAppointments((prev: any) => {
+      //   return [...prev, newAppointmentDetails];
+      // });
       setPopupControl(false);
       setToastMessage({
         IsShow: true,

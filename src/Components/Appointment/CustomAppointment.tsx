@@ -7,6 +7,7 @@ import PeoplePickerField from '../Formfields/PeoplePicker/CustomPeoplePicker';
 import styles from "../ClientDetail/ClientDetails.module.scss"
 import CustomCalendarDateTime from '../Formfields/CalendarDateTime/CustomCalendarDateTime';
 import CustomEditor from '../QuilEditor/CustomQuilEditor';
+import moment from 'moment';
 interface Props {
     data: CompleteCaseForm;
     onChange: <K extends keyof CompleteCaseForm>(key: K, value: CompleteCaseForm[K]) => void;
@@ -48,6 +49,8 @@ const AppointmentLayout: React.FC<Props> = ({
                         label="From date & time"
                         disableWrapper
                         value={data.FromDateTime}
+                        minDate={moment().format("YYYY-MM-DD HH:mm:ss")}
+
                         onChange={(val) => onChange('FromDateTime', val)}
                         error={error.FromDateTime}
                         required
@@ -69,6 +72,12 @@ const AppointmentLayout: React.FC<Props> = ({
                         onChange={(val) => onChange('ToDateTime', val)}
                         error={error.ToDateTime}
                         required
+                        minDate={data.FromDateTime}
+                        maxDate={moment(data.FromDateTime)
+                            .endOf("day")
+                            .format("YYYY-MM-DD HH:mm:ss")}
+
+                        disabled={data.FromDateTime === "" ? true : false}
                     />
                     {/* <          DatePickerField
 

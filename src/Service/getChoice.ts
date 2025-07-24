@@ -22,14 +22,14 @@ export const getChoiceData = async (
 };
 
 // Function overloads
-export async function getChoiceDropdownOptions(
-  field: string,
-  Listname: string
-): Promise<DropdownOption[]>;
-export async function getChoiceDropdownOptions(
-  fields: string[],
-  Listname: string
-): Promise<Record<string, DropdownOption[]>>;
+// export async function getChoiceDropdownOptions(
+//   field: string,
+//   Listname: string
+// ): Promise<DropdownOption[]>;
+// export async function getChoiceDropdownOptions(
+//   fields: string[],
+//   Listname: string
+// ): Promise<Record<string, DropdownOption[]>>;
 
 // Unified implementation
 export async function getChoiceDropdownOptions(
